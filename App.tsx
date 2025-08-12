@@ -295,16 +295,36 @@ const MainAppView = () => {
   
   const handleDownloadXLSX = useCallback(() => {
     if (scenes.length === 0) return;
-    const dataForSheet = scenes.map(scene => ({
-        [t('xlsxHeaderSceneNumber')]: scene.sceneNumber, 
-        [t('xlsxHeaderOriginalText')]: scene.originalText,
-        [t('xlsxHeaderVisualDesc')]: scene.visualDescription, 
-        [t('xlsxHeaderImagePrompt')]: scene.imagePrompt,
-    }));
+
+    const hasTranslations = scenes.some(scene => scene.translatedText);
+
+    const dataForSheet = scenes.map(scene => {
+      const rowData: { [key: string]: string | number } = {};
+      rowData[t('xlsxHeaderSceneNumber')] = scene.sceneNumber;
+      rowData[t('xlsxHeaderOriginalText')] = scene.originalText;
+
+      if (hasTranslations) {
+        rowData[t('xlsxHeaderTranslatedText')] = scene.translatedText || '';
+      }
+
+      rowData[t('xlsxHeaderVisualDesc')] = scene.visualDescription;
+      rowData[t('xlsxHeaderImagePrompt')] = scene.imagePrompt;
+      
+      return rowData;
+    });
+
     const worksheet = XLSX.utils.json_to_sheet(dataForSheet);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, t('xlsxSheetName'));
-    worksheet["!cols"] = [ { wch: 10 }, { wch: 60 }, { wch: 50 }, { wch: 70 } ];
+    
+    const colWidths = [{ wch: 10 }, { wch: 60 }]; // Scene#, Original
+    if (hasTranslations) {
+      colWidths.push({ wch: 60 }); // Translated
+    }
+    colWidths.push({ wch: 50 }, { wch: 70 }); // Visual, Prompt
+    
+    worksheet["!cols"] = colWidths;
+    
     XLSX.writeFile(workbook, `${t('xlsxFileName')}.xlsx`);
   }, [scenes, t]);
 

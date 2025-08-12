@@ -88,7 +88,7 @@ export const breakdownScript = async (
     }
     
     // Validate and map the data to ensure it conforms to the Scene type
-    const validatedScenes: Scene[] = parsedData.map(item => {
+    const validatedScenes: Scene[] = parsedData.map((item): Scene | null => {
         if (
             typeof item.sceneNumber === 'number' &&
             typeof item.originalText === 'string' &&
