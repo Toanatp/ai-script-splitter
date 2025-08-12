@@ -12,6 +12,7 @@ export const breakdownScript = async (
   aspectRatioValue: string,
   imageStylePrompt: string,
   characterDefinitions: string,
+  translationLanguage: string,
   lang: 'vi' | 'en' | 'zh' | 'ja' | 'ko',
   errorApiKeyMissing: string,
   errorInvalidResponse: string,
@@ -33,6 +34,7 @@ export const breakdownScript = async (
     imageStylePrompt,
     aspectRatioValue,
     characterDefinitions,
+    translationLanguage,
     scriptText,
   });
 
@@ -48,6 +50,10 @@ export const breakdownScript = async (
         originalText: { 
           type: Type.STRING, 
           description: "The full, unchanged original text from the script for this scene." 
+        },
+        translatedText: {
+            type: Type.STRING,
+            description: `The translation of the original text into the requested language. This field is only present if a translation was requested.`
         },
         visualDescription: { 
           type: Type.STRING, 
@@ -81,12 +87,24 @@ export const breakdownScript = async (
       throw new Error(errorInvalidResponse);
     }
     
-    const validatedScenes: Scene[] = parsedData.filter(item => 
-        typeof item.sceneNumber === 'number' &&
-        typeof item.originalText === 'string' &&
-        typeof item.visualDescription === 'string' &&
-        typeof item.imagePrompt === 'string'
-    );
+    // Validate and map the data to ensure it conforms to the Scene type
+    const validatedScenes: Scene[] = parsedData.map(item => {
+        if (
+            typeof item.sceneNumber === 'number' &&
+            typeof item.originalText === 'string' &&
+            typeof item.visualDescription === 'string' &&
+            typeof item.imagePrompt === 'string'
+        ) {
+            return {
+                sceneNumber: item.sceneNumber,
+                originalText: item.originalText,
+                visualDescription: item.visualDescription,
+                imagePrompt: item.imagePrompt,
+                translatedText: typeof item.translatedText === 'string' ? item.translatedText : undefined,
+            };
+        }
+        return null; // This item is invalid
+    }).filter((item): item is Scene => item !== null); // Filter out nulls and assert type
 
     if(validatedScenes.length !== parsedData.length) {
         console.warn("Some items in the AI's response had incorrect formats and were filtered out.");

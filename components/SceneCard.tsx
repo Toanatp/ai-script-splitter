@@ -31,6 +31,14 @@ const SceneCard: React.FC<SceneCardProps> = ({ scene }) => {
             {scene.originalText}
           </p>
         </div>
+        {scene.translatedText && (
+          <div>
+            <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">{t('sceneCardTranslatedText')}</h4>
+            <p className="text-gray-300 bg-black/20 p-3 rounded-md border border-gray-700/50">
+              {scene.translatedText}
+            </p>
+          </div>
+        )}
         <div>
           <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">{t('sceneCardVisualIdea')}</h4>
           <p className="text-gray-300">{scene.visualDescription}</p>

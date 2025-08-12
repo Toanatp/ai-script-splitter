@@ -25,6 +25,7 @@ export interface StyleOption {
 export interface Scene {
   sceneNumber: number;
   originalText: string;
+  translatedText?: string;
   visualDescription: string;
   imagePrompt: string;
 }

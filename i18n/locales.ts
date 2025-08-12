@@ -28,6 +28,7 @@ const translations: AllTranslations = {
     themeLabel: "Chủ đề",
     ratioLabel: "Tỷ lệ ảnh",
     styleLabel: "Phong cách ảnh",
+    translateLabel: "Dịch lời thoại sang",
     characterLabel: "Định nghĩa nhân vật (Tùy chọn)",
     scriptLabel: "Kịch bản chính",
 
@@ -55,6 +56,7 @@ const translations: AllTranslations = {
     addNewRatio: "+ Thêm tỷ lệ mới...",
     addNewStyle: "+ Thêm phong cách mới...",
     customOptionSuffix: "(Tự tạo)",
+    translate_none: "Không dịch (Giữ nguyên gốc)",
     
     // Results Area
     readyTitle: "Sẵn sàng để bắt đầu",
@@ -63,6 +65,7 @@ const translations: AllTranslations = {
     // Scene Card
     sceneCardTitle: "Phân cảnh",
     sceneCardOriginalText: "Đoạn kịch bản gốc",
+    sceneCardTranslatedText: "Lời thoại đã dịch",
     sceneCardVisualIdea: "Ý tưởng hình ảnh",
     sceneCardImagePrompt: "Prompt tạo ảnh (Tiếng Anh)",
 
@@ -156,6 +159,7 @@ const translations: AllTranslations = {
     themeLabel: "Theme",
     ratioLabel: "Aspect Ratio",
     styleLabel: "Image Style",
+    translateLabel: "Translate Dialogue to",
     characterLabel: "Character Definitions (Optional)",
     scriptLabel: "Main Script",
     apiKeyPlaceholder: "Paste your API Key here",
@@ -177,10 +181,12 @@ const translations: AllTranslations = {
     addNewRatio: "+ Add new ratio...",
     addNewStyle: "+ Add new style...",
     customOptionSuffix: "(Custom)",
+    translate_none: "None (Keep Original)",
     readyTitle: "Ready to Start",
     readyMessage: "Enter your API Key above to begin generating scenes. Your results will appear here.",
     sceneCardTitle: "Scene",
     sceneCardOriginalText: "Original Script Text",
+    sceneCardTranslatedText: "Translated Dialogue",
     sceneCardVisualIdea: "Visual Idea",
     sceneCardImagePrompt: "Image Prompt (English)",
     errorAlertTitle: "Error!",
@@ -264,6 +270,7 @@ const translations: AllTranslations = {
     themeLabel: "主题",
     ratioLabel: "宽高比",
     styleLabel: "图像风格",
+    translateLabel: "将对话翻译成",
     characterLabel: "角色定义 (可选)",
     scriptLabel: "主剧本",
     apiKeyPlaceholder: "在此处粘贴您的 API 密钥",
@@ -285,10 +292,12 @@ const translations: AllTranslations = {
     addNewRatio: "+ 添加新宽高比...",
     addNewStyle: "+ 添加新风格...",
     customOptionSuffix: "(自定义)",
+    translate_none: "不翻译 (保留原文)",
     readyTitle: "准备开始",
     readyMessage: "在上方输入您的 API 密钥以开始生成场景。您的结果将显示在此处。",
     sceneCardTitle: "场景",
     sceneCardOriginalText: "原始剧本文字",
+    sceneCardTranslatedText: "翻译后的对话",
     sceneCardVisualIdea: "视觉构想",
     sceneCardImagePrompt: "图像提示 (英文)",
     errorAlertTitle: "错误!",
@@ -372,6 +381,7 @@ const translations: AllTranslations = {
     themeLabel: "テーマ",
     ratioLabel: "アスペクト比",
     styleLabel: "画像スタイル",
+    translateLabel: "対話を翻訳",
     characterLabel: "キャラクター定義 (任意)",
     scriptLabel: "メイン脚本",
     apiKeyPlaceholder: "ここにAPIキーを貼り付けてください",
@@ -393,10 +403,12 @@ const translations: AllTranslations = {
     addNewRatio: "+ 新しい比率を追加...",
     addNewStyle: "+ 新しいスタイルを追加...",
     customOptionSuffix: "(カスタム)",
+    translate_none: "翻訳しない (原文のまま)",
     readyTitle: "準備完了",
     readyMessage: "上記のAPIキーを入力してシーンの生成を開始してください。結果はここに表示されます。",
     sceneCardTitle: "シーン",
     sceneCardOriginalText: "元の脚本テキスト",
+    sceneCardTranslatedText: "翻訳された対話",
     sceneCardVisualIdea: "ビジュアルアイデア",
     sceneCardImagePrompt: "画像プロンプト (英語)",
     errorAlertTitle: "エラー！",
@@ -480,6 +492,7 @@ const translations: AllTranslations = {
     themeLabel: "테마",
     ratioLabel: "종횡비",
     styleLabel: "이미지 스타일",
+    translateLabel: "대화 번역",
     characterLabel: "캐릭터 정의 (선택 사항)",
     scriptLabel: "메인 스크립트",
     apiKeyPlaceholder: "API 키를 여기에 붙여넣으세요",
@@ -501,10 +514,12 @@ const translations: AllTranslations = {
     addNewRatio: "+ 새 비율 추가...",
     addNewStyle: "+ 새 스타일 추가...",
     customOptionSuffix: "(사용자 정의)",
+    translate_none: "번역 안 함 (원본 유지)",
     readyTitle: "시작할 준비가 되었습니다",
     readyMessage: "장면 생성을 시작하려면 위에 API 키를 입력하세요. 결과는 여기에 표시됩니다.",
     sceneCardTitle: "장면",
     sceneCardOriginalText: "원본 스크립트 텍스트",
+    sceneCardTranslatedText: "번역된 대화",
     sceneCardVisualIdea: "시각적 아이디어",
     sceneCardImagePrompt: "이미지 프롬프트 (영어)",
     errorAlertTitle: "오류!",
@@ -580,10 +595,19 @@ type PromptTemplateArgs = {
   imageStylePrompt: string,
   aspectRatioValue: string,
   characterDefinitions: string,
+  translationLanguage: string,
   scriptText: string,
 }
 
-const enPromptTemplate = ({ duration, themeName, targetWordCount, imageStylePrompt, aspectRatioValue, characterDefinitions, scriptText }: PromptTemplateArgs) => `Analyze the following script. Your task is to split it into scenes and create image prompts according to the detailed rules below.
+const languageMap: { [key: string]: string } = {
+    vi: "Vietnamese",
+    en: "English",
+    zh: "Chinese",
+    ja: "Japanese",
+    ko: "Korean"
+};
+
+const enPromptTemplate = ({ duration, themeName, targetWordCount, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, scriptText }: PromptTemplateArgs) => `Analyze the following script. Your task is to split it into scenes and create image prompts according to the detailed rules below.
 
 **SCENE SPLITTING RULES:**
 1.  **Duration:** Each scene's original text should correspond to a speaking duration of approximately ${duration} seconds. Based on the "${themeName}" theme, estimate the original text length for each scene to be around ${targetWordCount} words. Split at natural pauses.
@@ -616,13 +640,20 @@ ${characterDefinitions.trim()
         ---`
     : ""}
 
-4.  **Ratio Optimization (Creative):** In addition to adding the technical parameter above, let the **${aspectRatioValue}** aspect ratio influence your description's content. For '9:16', describe vertical elements. For '16:9', describe wide landscapes.
+${translationLanguage && translationLanguage !== 'none'
+    ? `4. **TRANSLATION (Conditional):** The user has requested a translation. For each scene, you **MUST** translate the \`originalText\` into **${languageMap[translationLanguage] || translationLanguage}**.
+    - Place the translated text into a new field called \`translatedText\`.
+    - If the original text is already in ${languageMap[translationLanguage] || translationLanguage}, just copy it to the \`translatedText\` field.
+    - The translation must be accurate and natural.`
+    : ""}
+
+5.  **Ratio Optimization (Creative):** In addition to adding the technical parameter above, let the **${aspectRatioValue}** aspect ratio influence your description's content. For '9:16', describe vertical elements. For '16:9', describe wide landscapes.
 
 **SCRIPT TO ANALYZE:**
 ${scriptText}`;
 
 const promptTemplates: {[key in Language]: (args: PromptTemplateArgs) => string} = {
-  vi: ({ duration, themeName, targetWordCount, imageStylePrompt, aspectRatioValue, characterDefinitions, scriptText }) => `Phân tích kịch bản sau đây. Nhiệm vụ của bạn là chia nó thành các phân cảnh và tạo prompt ảnh theo các quy tắc chi tiết dưới đây.
+  vi: ({ duration, themeName, targetWordCount, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, scriptText }: PromptTemplateArgs) => `Phân tích kịch bản sau đây. Nhiệm vụ của bạn là chia nó thành các phân cảnh và tạo prompt ảnh theo các quy tắc chi tiết dưới đây.
 
 **QUY TẮC PHÂN CẢNH:**
 1. **Thời lượng:** Mỗi phân cảnh phải có độ dài văn bản gốc tương ứng với thời lượng nói khoảng ${duration} giây. Dựa trên chủ đề "${themeName}", hãy ước tính độ dài văn bản gốc cho mỗi phân cảnh vào khoảng ${targetWordCount} từ. Chia ở những điểm ngắt nghỉ tự nhiên.
@@ -655,7 +686,14 @@ ${characterDefinitions.trim()
       ---`
     : ""}
 
-4. **Tối ưu Tỷ lệ (Sáng tạo):** Ngoài việc thêm tham số kỹ thuật ở trên, hãy để tỷ lệ khung hình **${aspectRatioValue}** ảnh hưởng đến nội dung mô tả của bạn. Ví dụ, với '9:16', hãy mô tả các yếu tố theo chiều dọc. Với '16:9', hãy mô tả cảnh quan rộng.
+${translationLanguage && translationLanguage !== 'none'
+    ? `4. **DỊCH THUẬT (Có điều kiện):** Người dùng đã yêu cầu dịch. Với mỗi phân cảnh, bạn **BẮT BUỘC** phải dịch \`originalText\` sang **${languageMap[translationLanguage] || translationLanguage}**.
+    - Đặt văn bản đã dịch vào một trường mới tên là \`translatedText\`.
+    - Nếu văn bản gốc đã là ${languageMap[translationLanguage] || translationLanguage}, chỉ cần sao chép nó vào trường \`translatedText\`.
+    - Bản dịch phải chính xác và tự nhiên.`
+    : ""}
+
+5. **Tối ưu Tỷ lệ (Sáng tạo):** Ngoài việc thêm tham số kỹ thuật ở trên, hãy để tỷ lệ khung hình **${aspectRatioValue}** ảnh hưởng đến nội dung mô tả của bạn. Ví dụ, với '9:16', hãy mô tả các yếu tố theo chiều dọc. Với '16:9', hãy mô tả cảnh quan rộng.
 
 **KỊCH BẢN ĐỂ PHÂN TÍCH:**
 ${scriptText}`,

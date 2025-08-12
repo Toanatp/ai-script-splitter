@@ -155,6 +155,7 @@ const MainAppView = () => {
   const [selectedThemeId, setSelectedThemeId] = useState<string>('storytelling');
   const [selectedAspectRatioId, setSelectedAspectRatioId] = useState<string>('16:9');
   const [selectedStyleId, setSelectedStyleId] = useState<string>('automatic');
+  const [translationLanguage, setTranslationLanguage] = useState<string>('none');
 
   const [modalMode, setModalMode] = useState<'theme' | 'ratio' | 'style' | null>(null);
   
@@ -201,6 +202,15 @@ const MainAppView = () => {
         })),
         ...customStyles.map(style => ({ ...style, name: `${style.name} (${t('customOptionSuffix')})`}))
   ], [t, customStyles]);
+
+  const translationOptions = useMemo(() => [
+    { id: 'none', name: t('translate_none') },
+    { id: 'vi', name: t('lang_vi') },
+    { id: 'en', name: t('lang_en') },
+    { id: 'zh', name: t('lang_zh') },
+    { id: 'ja', name: t('lang_ja') },
+    { id: 'ko', name: t('lang_ko') },
+  ], [t]);
 
 
   const handleSelectionChange = (type: 'theme' | 'ratio' | 'style', value: string) => {
@@ -268,6 +278,7 @@ const MainAppView = () => {
         selectedAspectRatio.value, 
         selectedStyle.prompt, 
         characterDefinitions, 
+        translationLanguage,
         language,
         t('errorApiKeyMissing'),
         t('errorInvalidResponse'),
@@ -280,7 +291,7 @@ const MainAppView = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [apiKey, script, duration, selectedTheme, selectedAspectRatio, selectedStyle, characterDefinitions, language, t]);
+  }, [apiKey, script, duration, selectedTheme, selectedAspectRatio, selectedStyle, characterDefinitions, translationLanguage, language, t]);
   
   const handleDownloadXLSX = useCallback(() => {
     if (scenes.length === 0) return;
@@ -371,7 +382,7 @@ const MainAppView = () => {
 
                     <hr className="border-gray-700" />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-x-6 gap-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div>
                             <label htmlFor="duration-input" className="block text-sm font-medium text-gray-300 mb-2">{t('durationLabel')}</label>
                             <input type="number" id="duration-input" value={duration} onChange={(e) => setDuration(Math.max(1, parseInt(e.target.value, 10) || 1))} className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-gray-200 focus:ring-2 focus:ring-cyan-500" min="1" />
@@ -395,6 +406,17 @@ const MainAppView = () => {
                             <select id="style-select" value={selectedStyleId} onChange={(e) => handleSelectionChange('style', e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-gray-200 focus:ring-2 focus:ring-cyan-500">
                                 {styleOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}
                                 <option value="add_new" className="font-bold text-cyan-400">{t('addNewStyle')}</option>
+                            </select>
+                        </div>
+                         <div className="lg:col-span-2">
+                            <label htmlFor="translate-select" className="block text-sm font-medium text-gray-300 mb-2">{t('translateLabel')}</label>
+                            <select 
+                                id="translate-select" 
+                                value={translationLanguage} 
+                                onChange={(e) => setTranslationLanguage(e.target.value)} 
+                                className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-gray-200 focus:ring-2 focus:ring-cyan-500"
+                            >
+                                {translationOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}
                             </select>
                         </div>
                     </div>
