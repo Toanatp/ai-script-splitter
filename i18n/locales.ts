@@ -1,3 +1,4 @@
+
 export type Language = 'vi' | 'en' | 'zh' | 'ja' | 'ko';
 
 type TranslationKeys = { [key: string]: string };
@@ -10,6 +11,10 @@ const translations: AllTranslations = {
     appTitle: "Trình Phân Cảnh Kịch Bản AI",
     appDescription: "Dán kịch bản, định nghĩa nhân vật, chọn tùy chọn. AI sẽ tự động chia cảnh, tạo prompt ảnh nhất quán và đúng phong cách.",
     
+    // Auth
+    signInTitle: "Chào mừng đến với Trình Phân Cảnh AI",
+    signInCTA: "Vui lòng đăng nhập để bắt đầu sử dụng công cụ.",
+
     // Language Names
     lang_vi: "Tiếng Việt",
     lang_en: "English",
@@ -138,6 +143,8 @@ const translations: AllTranslations = {
   en: {
     appTitle: "AI Script Scene Splitter",
     appDescription: "Paste your script, define characters, choose options. The AI will automatically split scenes and generate consistent, stylized image prompts.",
+    signInTitle: "Welcome to the AI Scene Splitter",
+    signInCTA: "Please sign in to start using the tool.",
     lang_vi: "Tiếng Việt",
     lang_en: "English",
     lang_zh: "中文",
@@ -243,6 +250,8 @@ const translations: AllTranslations = {
   zh: {
     appTitle: "AI 剧本场景拆分工具",
     appDescription: "粘贴您的剧本，定义角色，选择选项。AI将自动拆分场景并生成风格一致的图像提示。",
+    signInTitle: "欢迎使用 AI 剧本场景拆分工具",
+    signInCTA: "请登录以开始使用该工具。",
     lang_vi: "Tiếng Việt",
     lang_en: "English",
     lang_zh: "中文",
@@ -348,6 +357,8 @@ const translations: AllTranslations = {
   ja: {
     appTitle: "AI脚本シーン分割ツール",
     appDescription: "脚本を貼り付け、キャラクターを定義し、オプションを選択します。AIが自動的にシーンを分割し、一貫性のあるスタイル化された画像プロンプトを生成します。",
+    signInTitle: "AI脚本シーン分割ツールへようこそ",
+    signInCTA: "ツールを使用するにはサインインしてください。",
     lang_vi: "Tiếng Việt",
     lang_en: "English",
     lang_zh: "中文",
@@ -453,6 +464,8 @@ const translations: AllTranslations = {
   ko: {
     appTitle: "AI 스크립트 장면 분할기",
     appDescription: "스크립트를 붙여넣고, 캐릭터를 정의하고, 옵션을 선택하세요. AI가 자동으로 장면을 분할하고 일관된 스타일의 이미지 프롬프트를 생성합니다.",
+    signInTitle: "AI 스크립트 장면 분할기에 오신 것을 환영합니다",
+    signInCTA: "도구를 사용하려면 로그인하십시오.",
     lang_vi: "Tiếng Việt",
     lang_en: "English",
     lang_zh: "中文",
