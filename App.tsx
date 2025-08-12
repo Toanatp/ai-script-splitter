@@ -13,7 +13,7 @@ import KeyIcon from './components/icons/KeyIcon';
 import InfoIcon from './components/icons/InfoIcon';
 import { useI18n } from './contexts/I18nContext';
 import LanguageSwitcher from './components/LanguageSwitcher';
-import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, UserButton, SignInButton } from '@clerk/clerk-react';
 
 
 // --- DỮ LIỆU MẶC ĐỊNH (RAW DATA)---
@@ -125,8 +125,12 @@ const SignedOutView = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-200">{t('signInTitle')}</h2>
             <p className="mt-4 text-lg text-gray-400 max-w-2xl">{t('signInCTA')}</p>
             <div className="mt-8">
-                 {/* The UserButton will render a "Sign In" button */}
-                 <UserButton afterSignOutUrl="/" />
+                 <SignInButton mode="modal">
+                     <button className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-full shadow-lg hover:from-cyan-600 hover:to-blue-700 transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-cyan-300/50">
+                        <SparklesIcon className="w-5 h-5 mr-2" />
+                        {t('signInButton')}
+                     </button>
+                 </SignInButton>
             </div>
         </div>
     );
