@@ -296,14 +296,14 @@ const MainAppView = () => {
   const handleDownloadXLSX = useCallback(() => {
     if (scenes.length === 0) return;
 
-    const hasTranslations = scenes.some(scene => scene.translatedText);
+    const includeTranslations = translationLanguage !== 'none';
 
     const dataForSheet = scenes.map(scene => {
       const rowData: { [key: string]: string | number } = {};
       rowData[t('xlsxHeaderSceneNumber')] = scene.sceneNumber;
       rowData[t('xlsxHeaderOriginalText')] = scene.originalText;
 
-      if (hasTranslations) {
+      if (includeTranslations) {
         rowData[t('xlsxHeaderTranslatedText')] = scene.translatedText || '';
       }
 
@@ -318,7 +318,7 @@ const MainAppView = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, t('xlsxSheetName'));
     
     const colWidths = [{ wch: 10 }, { wch: 60 }]; // Scene#, Original
-    if (hasTranslations) {
+    if (includeTranslations) {
       colWidths.push({ wch: 60 }); // Translated
     }
     colWidths.push({ wch: 50 }, { wch: 70 }); // Visual, Prompt
@@ -326,7 +326,7 @@ const MainAppView = () => {
     worksheet["!cols"] = colWidths;
     
     XLSX.writeFile(workbook, `${t('xlsxFileName')}.xlsx`);
-  }, [scenes, t]);
+  }, [scenes, t, translationLanguage]);
 
   const handleDownloadTXT = useCallback(() => {
     if (scenes.length === 0) return;
