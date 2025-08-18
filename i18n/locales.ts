@@ -1,4 +1,5 @@
 
+
 export type Language = 'vi' | 'en' | 'zh' | 'ja' | 'ko';
 
 type TranslationKeys = { [key: string]: string };
@@ -8,7 +9,7 @@ const translations: AllTranslations = {
   // --- TIẾNG VIỆT ---
   vi: {
     // App Info & Header
-    appTitle: "Trình Phân Cảnh Kịch Bản AI",
+    appTitle: "Trình Phân Cảnh Kịch Bản AI by Bit Đô",
     appDescription: "Dán kịch bản, định nghĩa nhân vật, chọn tùy chọn. AI sẽ tự động chia cảnh, tạo prompt ảnh nhất quán và đúng phong cách.",
     
     // Language Names
@@ -17,6 +18,10 @@ const translations: AllTranslations = {
     lang_zh: "中文",
     lang_ja: "日本語",
     lang_ko: "한국어",
+
+    // Tabs
+    tab_splitter: "Tự động Phân Cảnh & Tạo Prompt",
+    tab_prompter: "Tạo Prompt từ Phân Cảnh có sẵn",
 
     // Form Labels
     apiKeyLabel: "Google AI API Key",
@@ -27,6 +32,9 @@ const translations: AllTranslations = {
     translateLabel: "Dịch lời thoại sang",
     characterLabel: "Định nghĩa nhân vật (Tùy chọn)",
     scriptLabel: "Kịch bản chính",
+    scriptLabel_prompter: "Kịch bản (đã được phân cảnh)",
+    prompter_instructions: "Dán kịch bản đã được chia thành các đoạn. AI sẽ nhận diện mỗi đoạn cách nhau bởi một dòng trống là một phân cảnh riêng biệt để tạo prompt.",
+
 
     // Placeholders & Tooltips
     apiKeyPlaceholder: "Dán API Key của bạn vào đây",
@@ -35,9 +43,12 @@ const translations: AllTranslations = {
     placeholderCharacters: `Định nghĩa nhân vật (mỗi dòng một nhân vật):\nArion: một chàng trai trẻ tóc bạc, mắt xanh, mặc áo dài màu xanh.\nElara: một nữ pháp sư thông thái với mái tóc trắng dài, tay cầm một cây trượng phát sáng.`,
     characterPlaceholder: "Định nghĩa nhân vật (mỗi dòng một nhân vật):\nTên Nhân Vật 1: mô tả chi tiết\nArion: a young man with silver hair, green eyes...",
     scriptPlaceholder: "Dán toàn bộ kịch bản của bạn vào đây...",
+    scriptPlaceholder_prompter: "Dán kịch bản đã được phân cảnh của bạn vào đây. Mỗi phân cảnh được ngăn cách bởi một dòng trống.",
+    scriptPlaceholder_prompter_example: `Tesla mất năm 1943 trong một căn phòng nhỏ, gần như không ai bên cạnh.\n\nÔng để lại hơn 300 bằng sáng chế, cùng hàng loạt sổ tay và ý tưởng, nhưng phần lớn bị lãng quên.\n\nSau khi ông qua đời, FBI đã niêm phong toàn bộ tài liệu nghiên cứu, lo ngại những ý tưởng điên rồ liên quan vũ khí hạt nhân.\n\nPhải đến nửa sau thế kỷ 20, người ta mới bắt đầu nhìn lại. Họ nhận ra Tesla đi trước thời đại cả trăm năm.`,
 
     // Buttons
     generateButton: "Tạo phân cảnh",
+    generatePromptsButton: "Tạo Prompts",
     generatingButton: "Đang phân tích...",
     downloadXlsxButton: "Tải file XLSX",
     downloadTxtButton: "Tải file TXT",
@@ -96,8 +107,14 @@ const translations: AllTranslations = {
     xlsxHeaderVisualDesc: "Ý nghĩa hình ảnh",
     xlsxHeaderImagePrompt: "Prompt tạo ảnh",
 
+    // Copyright Intro Section
+    copyrightText_part1: "Bản quyền công cụ thuộc về kênh",
+    youtubeLinkText: "Kênh YouTube",
+    zaloGroupLinkText: "Nhóm Zalo",
+    zaloPersonalText: "Zalo Cá nhân:",
+
     // Footer
-    footerText: "Được tạo bởi Senior Frontend Engineer với Gemini API. Xem mã nguồn trên <a href='https://github.com' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>GitHub</a>.",
+    footerText: "Bản quyền thuộc về <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. Tham gia <a href='https://zalo.me/g/ubgxhh983' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>nhóm Zalo</a> | Liên hệ: 0342472776 | Xem mã nguồn trên <a href='https://github.com' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>GitHub</a>.",
 
     // Default Option Names
     theme_storytelling: "Kể chuyện / Tóm tắt phim",
@@ -141,13 +158,15 @@ const translations: AllTranslations = {
 
   // --- ENGLISH ---
   en: {
-    appTitle: "AI Script Scene Splitter",
+    appTitle: "AI Script Scene Splitter by Bit Đô",
     appDescription: "Paste your script, define characters, choose options. The AI will automatically split scenes and generate consistent, stylized image prompts.",
     lang_vi: "Tiếng Việt",
     lang_en: "English",
     lang_zh: "中文",
     lang_ja: "日本語",
     lang_ko: "한국어",
+    tab_splitter: "Auto Scene Split & Prompt",
+    tab_prompter: "Prompt from Pre-scened Script",
     apiKeyLabel: "Google AI API Key",
     durationLabel: "Duration (seconds)",
     themeLabel: "Theme",
@@ -156,13 +175,18 @@ const translations: AllTranslations = {
     translateLabel: "Translate Dialogue to",
     characterLabel: "Character Definitions (Optional)",
     scriptLabel: "Main Script",
+    scriptLabel_prompter: "Script (Pre-scened)",
+    prompter_instructions: "Paste your script, already divided into segments. The AI will recognize each segment separated by a blank line as a distinct scene to generate a prompt for.",
     apiKeyPlaceholder: "Paste your API Key here",
     apiKeyTooltip: "Your key is stored in your browser's local storage and is never sent anywhere except to Google's API. Get your key from Google AI Studio.",
     placeholderScript: "Hello everyone, and welcome back to our channel. In today's video, we're going to explore a very interesting topic: the history of pizza...",
     placeholderCharacters: `Define characters (one per line):\nArion: a young man with silver hair, green eyes, wearing a blue tunic.\nElara: a wise sorceress with long white hair, holding a glowing staff.`,
     characterPlaceholder: "Define characters (one per line):\nCharacter Name 1: detailed description\nArion: a young man with silver hair, green eyes...",
     scriptPlaceholder: "Paste your entire script here...",
+    scriptPlaceholder_prompter: "Paste your pre-scened script here. Each scene is separated by a blank line.",
+    scriptPlaceholder_prompter_example: `Tesla died in 1943 in a small room, almost alone.\n\nHe left behind over 300 patents, numerous notebooks and ideas, but most were forgotten.\n\nAfter his death, the FBI sealed all his research documents, fearing crazy ideas related to nuclear weapons.\n\nIt wasn't until the second half of the 20th century that people began to look back. They realized Tesla was a hundred years ahead of his time.`,
     generateButton: "Generate Scenes",
+    generatePromptsButton: "Generate Prompts",
     generatingButton: "Analyzing...",
     downloadXlsxButton: "Download XLSX",
     downloadTxtButton: "Download TXT",
@@ -208,7 +232,11 @@ const translations: AllTranslations = {
     xlsxHeaderTranslatedText: "Translated Text",
     xlsxHeaderVisualDesc: "Visual Description",
     xlsxHeaderImagePrompt: "Image Prompt",
-    footerText: "Created by a Senior Frontend Engineer with Gemini API. View source on <a href='https://github.com' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>GitHub</a>.",
+    copyrightText_part1: "Tool copyright belongs to the channel",
+    youtubeLinkText: "YouTube Channel",
+    zaloGroupLinkText: "Zalo Group",
+    zaloPersonalText: "Personal Zalo:",
+    footerText: "Copyright © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. Join <a href='https://zalo.me/g/ubgxhh983' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo Group</a> | Contact: 0342472776 | View source on <a href='https://github.com' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>GitHub</a>.",
     theme_storytelling: "Storytelling / Movie Recap",
     theme_news: "News / Updates",
     theme_science: "Science / Discovery",
@@ -250,13 +278,15 @@ const translations: AllTranslations = {
 
   // --- 中文 ---
   zh: {
-    appTitle: "AI 剧本场景拆分工具",
+    appTitle: "AI 剧本场景拆分工具 by Bit Đô",
     appDescription: "粘贴您的剧本，定义角色，选择选项。AI将自动拆分场景并生成风格一致的图像提示。",
     lang_vi: "Tiếng Việt",
     lang_en: "English",
     lang_zh: "中文",
     lang_ja: "日本語",
     lang_ko: "한국어",
+    tab_splitter: "自动场景拆分和提示生成",
+    tab_prompter: "从预设场景生成提示",
     apiKeyLabel: "Google AI API 密钥",
     durationLabel: "时长 (秒)",
     themeLabel: "主题",
@@ -265,13 +295,18 @@ const translations: AllTranslations = {
     translateLabel: "将对话翻译成",
     characterLabel: "角色定义 (可选)",
     scriptLabel: "主剧本",
+    scriptLabel_prompter: "剧本 (已分场景)",
+    prompter_instructions: "粘贴您已分段的剧本。AI会将每个用空行分隔的段落识别为独立的场景来生成提示。",
     apiKeyPlaceholder: "在此处粘贴您的 API 密钥",
     apiKeyTooltip: "您的密钥存储在浏览器的本地存储中，除了 Google 的 API 之外，绝不会发送到任何地方。从 Google AI Studio 获取您的密钥。",
     placeholderScript: "大家好，欢迎回到我们的频道。在今天的视频中，我们将探讨一个非常有趣的话题：披萨的历史...",
     placeholderCharacters: `定义角色 (每行一个):\n阿瑞安: 一个银发绿眼的年轻男子，穿着蓝色束腰外衣。\n艾拉拉: 一位白发长长的智慧女巫，手持发光法杖。`,
     characterPlaceholder: "定义角色 (每行一个):\n角色名1: 详细描述\n阿瑞安: a young man with silver hair, green eyes...",
     scriptPlaceholder: "在此处粘贴您的完整剧本...",
+    scriptPlaceholder_prompter: "在此处粘贴您已分好场景的剧本。每个场景之间用一个空行隔开。",
+    scriptPlaceholder_prompter_example: `特斯拉于1943年在一个小房间里去世，几乎无人陪伴。\n\n他留下了300多项专利，无数的笔记本和想法，但大部分都被遗忘了。\n\n他去世后，联邦调查局（FBI）封存了他所有的研究文件，担心其中与核武器有关的疯狂想法。\n\n直到20世纪下半叶，人们才开始重新审视他。他们意识到特斯拉领先于他所在的时代一百年。`,
     generateButton: "生成场景",
+    generatePromptsButton: "生成提示",
     generatingButton: "分析中...",
     downloadXlsxButton: "下载 XLSX",
     downloadTxtButton: "下载 TXT",
@@ -317,7 +352,11 @@ const translations: AllTranslations = {
     xlsxHeaderTranslatedText: "翻译内容",
     xlsxHeaderVisualDesc: "视觉描述",
     xlsxHeaderImagePrompt: "图像提示",
-    footerText: "由高级前端工程师使用 Gemini API 创建。在 <a href='https://github.com' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>GitHub</a> 上查看源代码。",
+    copyrightText_part1: "工具版权归频道所有",
+    youtubeLinkText: "YouTube 频道",
+    zaloGroupLinkText: "Zalo 群组",
+    zaloPersonalText: "个人 Zalo:",
+    footerText: "版权所有 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. 加入 <a href='https://zalo.me/g/ubgxhh983' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo 群组</a> | 联系: 0342472776 | 在 <a href='https://github.com' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>GitHub</a> 上查看源代码。",
     theme_storytelling: "故事/电影解说",
     theme_news: "新闻/更新",
     theme_science: "科学/发现",
@@ -359,13 +398,15 @@ const translations: AllTranslations = {
 
   // --- 日本語 ---
   ja: {
-    appTitle: "AI脚本シーン分割ツール",
+    appTitle: "AI脚本シーン分割ツール by Bit Đô",
     appDescription: "脚本を貼り付け、キャラクターを定義し、オプションを選択します。AIが自動的にシーンを分割し、一貫性のあるスタイル化された画像プロンプトを生成します。",
     lang_vi: "Tiếng Việt",
     lang_en: "English",
     lang_zh: "中文",
     lang_ja: "日本語",
     lang_ko: "한국어",
+    tab_splitter: "自動シーン分割＆プロンプト生成",
+    tab_prompter: "事前分割済み脚本からプロンプトを生成",
     apiKeyLabel: "Google AI APIキー",
     durationLabel: "時間 (秒)",
     themeLabel: "テーマ",
@@ -374,13 +415,18 @@ const translations: AllTranslations = {
     translateLabel: "対話を翻訳",
     characterLabel: "キャラクター定義 (任意)",
     scriptLabel: "メイン脚本",
+    scriptLabel_prompter: "脚本 (シーン分割済み)",
+    prompter_instructions: "既にセグメントに分割された脚本を貼り付けてください。AIは空行で区切られた各セグメントを個別のシーンとして認識し、プロンプトを生成します。",
     apiKeyPlaceholder: "ここにAPIキーを貼り付けてください",
     apiKeyTooltip: "キーはブラウザのローカルストレージに保存され、GoogleのAPI以外には送信されません。Google AI Studioからキーを取得してください。",
     placeholderScript: "皆さん、こんにちは。私たちのチャンネルへようこそ。今日のビデオでは、非常に興味深いトピック、ピザの歴史について探求します...",
     placeholderCharacters: `キャラクターを定義します (1行に1人):\nアリオン: 銀髪で緑色の目をした若い男性、青いチュニックを着用。\nエララ: 長い白髪の賢い魔女、光る杖を持っている。`,
     characterPlaceholder: "キャラクターを定義します (1行に1人):\nキャラクター名1: 詳細な説明\nアリオン: a young man with silver hair, green eyes...",
     scriptPlaceholder: "ここに脚本全体を貼り付けてください...",
+    scriptPlaceholder_prompter: "ここにシーン分割済みの脚本を貼り付けてください。各シーンは空行で区切られます。",
+    scriptPlaceholder_prompter_example: `テスラは1943年に小さな部屋で、ほとんど一人で亡くなりました。\n\n彼は300以上の特許、多数のノートやアイデアを残しましたが、そのほとんどは忘れ去られました。\n\n彼の死後、FBIは核兵器に関連する狂気じみたアイデアを恐れて、彼の研究資料をすべて封印しました。\n\n人々が彼を再評価し始めたのは20世紀後半になってからでした。彼らはテスラが時代を100年も先取りしていたことに気づきました。`,
     generateButton: "シーンを生成",
+    generatePromptsButton: "プロンプトを生成",
     generatingButton: "分析中...",
     downloadXlsxButton: "XLSX をダウンロード",
     downloadTxtButton: "TXT をダウンロード",
@@ -426,7 +472,11 @@ const translations: AllTranslations = {
     xlsxHeaderTranslatedText: "翻訳された内容",
     xlsxHeaderVisualDesc: "ビジュアル説明",
     xlsxHeaderImagePrompt: "画像プロンプト",
-    footerText: "シニアフロントエンドエンジニアがGemini APIで作成。<a href='https://github.com' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>GitHub</a>でソースを表示。",
+    copyrightText_part1: "ツールの著作権はチャンネルに帰属します",
+    youtubeLinkText: "YouTubeチャンネル",
+    zaloGroupLinkText: "Zaloグループ",
+    zaloPersonalText: "個人Zalo:",
+    footerText: "著作権 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. <a href='https://zalo.me/g/ubgxhh983' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo グループ</a>に参加 | 連絡先: 0342472776 | <a href='https://github.com' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>GitHub</a>でソースを表示。",
     theme_storytelling: "物語/映画の要約",
     theme_news: "ニュース/更新情報",
     theme_science: "科学/発見",
@@ -468,13 +518,15 @@ const translations: AllTranslations = {
 
   // --- 한국어 ---
   ko: {
-    appTitle: "AI 스크립트 장면 분할기",
+    appTitle: "AI 스크립트 장면 분할기 by Bit Đô",
     appDescription: "스크립트를 붙여넣고, 캐릭터를 정의하고, 옵션을 선택하세요. AI가 자동으로 장면을 분할하고 일관된 스타일의 이미지 프롬프트를 생성합니다.",
     lang_vi: "Tiếng Việt",
     lang_en: "English",
     lang_zh: "中文",
     lang_ja: "日本語",
     lang_ko: "한국어",
+    tab_splitter: "자동 장면 분할 및 프롬프트 생성",
+    tab_prompter: "미리 나눈 장면에서 프롬프트 생성",
     apiKeyLabel: "Google AI API 키",
     durationLabel: "지속 시간 (초)",
     themeLabel: "테마",
@@ -483,13 +535,18 @@ const translations: AllTranslations = {
     translateLabel: "대화 번역",
     characterLabel: "캐릭터 정의 (선택 사항)",
     scriptLabel: "메인 스크립트",
+    scriptLabel_prompter: "스크립트 (장면 분할됨)",
+    prompter_instructions: "이미 세그먼트로 나뉜 스크립트를 붙여넣으세요. AI는 빈 줄로 구분된 각 세그먼트를 별개의 장면으로 인식하여 프롬프트를 생성합니다.",
     apiKeyPlaceholder: "API 키를 여기에 붙여넣으세요",
     apiKeyTooltip: "키는 브라우저의 로컬 저장소에 저장되며 Google의 API를 제외하고는 어디에도 전송되지 않습니다. Google AI Studio에서 키를 받으세요.",
     placeholderScript: "여러분, 안녕하세요. 저희 채널에 오신 것을 환영합니다. 오늘 영상에서는 매우 흥미로운 주제인 피자의 역사에 대해 알아보겠습니다...",
     placeholderCharacters: `캐릭터 정의 (한 줄에 한 명):\n아리온: 은색 머리카락과 녹색 눈을 가진 젊은 남성, 파란색 튜닉을 입고 있음.\n엘라라: 긴 흰 머리카락을 가진 현명한 마법사, 빛나는 지팡이를 들고 있음.`,
     characterPlaceholder: "캐릭터 정의 (한 줄에 한 명):\n캐릭터 이름 1: 상세 설명\n아리온: a young man with silver hair, green eyes...",
     scriptPlaceholder: "여기에 전체 스크립트를 붙여넣으세요...",
+    scriptPlaceholder_prompter: "미리 장면을 나눈 스크립트를 여기에 붙여넣으세요. 각 장면은 빈 줄로 구분됩니다.",
+    scriptPlaceholder_prompter_example: `테슬라는 1943년 작은 방에서 거의 혼자 사망했습니다.\n\n그는 300개가 넘는 특허, 수많은 노트와 아이디어를 남겼지만 대부분 잊혀졌습니다.\n\n그의 사후 FBI는 핵무기와 관련된 미친 아이디어를 우려하여 그의 모든 연구 문서를 봉인했습니다.\n\n20세기 후반이 되어서야 사람들은 그를 다시 돌아보기 시작했습니다. 그들은 테슬라가 시대를 100년이나 앞서갔다는 것을 깨달았습니다.`,
     generateButton: "장면 생성",
+    generatePromptsButton: "프롬프트 생성",
     generatingButton: "분석 중...",
     downloadXlsxButton: "XLSX 다운로드",
     downloadTxtButton: "TXT 다운로드",
@@ -535,7 +592,11 @@ const translations: AllTranslations = {
     xlsxHeaderTranslatedText: "번역된 내용",
     xlsxHeaderVisualDesc: "시각적 설명",
     xlsxHeaderImagePrompt: "이미지 프롬프트",
-    footerText: "시니어 프론트엔드 엔지니어가 Gemini API로 제작. <a href='https://github.com' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>GitHub</a>에서 소스 보기.",
+    copyrightText_part1: "도구 저작권은 채널에 있습니다",
+    youtubeLinkText: "YouTube 채널",
+    zaloGroupLinkText: "Zalo 그룹",
+    zaloPersonalText: "개인 Zalo:",
+    footerText: "저작권 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. <a href='https://zalo.me/g/ubgxhh983' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo 그룹</a>에 가입 | 연락처: 0342472776 | <a href='https://github.com' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>GitHub</a>에서 소스 보기.",
     theme_storytelling: "스토리텔링 / 영화 요약",
     theme_news: "뉴스 / 업데이트",
     theme_science: "과학 / 발견",
@@ -577,9 +638,9 @@ const translations: AllTranslations = {
 };
 
 type PromptTemplateArgs = {
-  duration: number,
-  themeName: string,
-  targetWordCount: number,
+  duration?: number,
+  themeName?: string,
+  targetWordCount?: number,
   imageStylePrompt: string,
   aspectRatioValue: string,
   characterDefinitions: string,
@@ -595,12 +656,7 @@ const languageMap: { [key: string]: string } = {
     ko: "Korean"
 };
 
-const enPromptTemplate = ({ duration, themeName, targetWordCount, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, scriptText }: PromptTemplateArgs) => `Analyze the following script. Your task is to split it into scenes and create image prompts according to the detailed rules below.
-
-**SCENE SPLITTING RULES:**
-1.  **Duration:** Each scene's original text should correspond to a speaking duration of approximately ${duration} seconds. Based on the "${themeName}" theme, estimate the original text length for each scene to be around ${targetWordCount} words. Split at natural pauses.
-2.  **Output Format:** Return a JSON array following the provided schema.
-
+const imagePromptRules = (imageStylePrompt: string, aspectRatioValue: string, characterDefinitions: string, translationLanguage: string) => `
 **IMAGE PROMPT CREATION RULES (MOST IMPORTANT):**
 You must create each 'imagePrompt' like an expert prompt engineer. Strictly adhere to the following rules:
 
@@ -636,59 +692,66 @@ ${translationLanguage && translationLanguage !== 'none'
     : ""}
 
 5.  **Ratio Optimization (Creative):** In addition to adding the technical parameter above, let the **${aspectRatioValue}** aspect ratio influence your description's content. For '9:16', describe vertical elements. For '16:9', describe wide landscapes.
+`;
 
+
+const enPromptTemplate = ({ duration, themeName, targetWordCount, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, scriptText }: PromptTemplateArgs) => `Analyze the following script. Your task is to split it into scenes and create image prompts according to the detailed rules below.
+
+**SCENE SPLITTING RULES:**
+1.  **Duration:** Each scene's original text should correspond to a speaking duration of approximately ${duration} seconds. Based on the "${themeName}" theme, estimate the original text length for each scene to be around ${targetWordCount} words. Split at natural pauses.
+2.  **Output Format:** Return a JSON array following the provided schema.
+${imagePromptRules(imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage)}
 **SCRIPT TO ANALYZE:**
 ${scriptText}`;
 
-const promptTemplates: {[key in Language]: (args: PromptTemplateArgs) => string} = {
-  vi: ({ duration, themeName, targetWordCount, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, scriptText }: PromptTemplateArgs) => `Phân tích kịch bản sau đây. Nhiệm vụ của bạn là chia nó thành các phân cảnh và tạo prompt ảnh theo các quy tắc chi tiết dưới đây.
+
+const viPromptTemplate = ({ duration, themeName, targetWordCount, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, scriptText }: PromptTemplateArgs) => `Phân tích kịch bản sau đây. Nhiệm vụ của bạn là chia nó thành các phân cảnh và tạo prompt ảnh theo các quy tắc chi tiết dưới đây.
 
 **QUY TẮC PHÂN CẢNH:**
 1. **Thời lượng:** Mỗi phân cảnh phải có độ dài văn bản gốc tương ứng với thời lượng nói khoảng ${duration} giây. Dựa trên chủ đề "${themeName}", hãy ước tính độ dài văn bản gốc cho mỗi phân cảnh vào khoảng ${targetWordCount} từ. Chia ở những điểm ngắt nghỉ tự nhiên.
 2. **Định dạng Output:** Trả về một mảng JSON theo schema đã cung cấp.
-
-**QUY TẮC TẠO PROMPT ẢNH (QUAN TRỌNG NHẤT):**
-Bạn phải tạo ra mỗi 'imagePrompt' như một chuyên gia prompt-engineer. Tuân thủ nghiêm ngặt các quy tắc sau:
-
-1. **CÔNG THỨC VÀNG:** Mỗi prompt phải được xây dựng theo cấu trúc sau, bằng TIẾNG ANH:
-   **[Loại hình & Phong cách] of [Chủ thể] + [Hành động/Tư thế] + in [Bối cảnh/Môi trường] + with [Ánh sáng] + [Màu sắc] + [Góc máy & Bố cục] + [Chi tiết, Chất lượng & Tham số]**
-
-2. **HƯỚNG DẪN CHI TIẾT TỪNG THÀNH PHẦN:**
-   - **Loại hình & Phong cách:** Bắt buộc sử dụng phong cách sau: **${imageStylePrompt}**. Nếu là "Tự động", hãy chọn một phong cách phù hợp nhất.
-   - **Chủ thể, Hành động, Bối cảnh:** Suy luận trực tiếp từ nội dung của \`originalText\` cho phân cảnh đó. Phải mô tả thật cụ thể.
-   - **Ánh sáng (Lighting):** **BẮT BUỘC** phải chọn một loại ánh sáng. Dựa vào tâm trạng của \`originalText\` để suy luận. VÍ DỤ: Cảnh yên bình dùng 'soft natural light', cảnh kịch tính dùng 'dramatic lighting, cinematic lighting', cảnh đêm ở thành phố dùng 'neon lights', cảnh hoàng hôn dùng 'golden hour'.
-   - **Màu sắc (Color):** **BẮT BUỘC** phải mô tả tông màu. VÍ DỤ: 'vibrant colors' cho cảnh vui tươi, 'monochromatic blue, cool tones' cho cảnh buồn hoặc lạnh lẽo, 'pastel color palette' cho cảnh mộng mơ.
-   - **Góc máy & Bố cục (Camera & Composition):** **BẮT BUỘC** phải chọn một góc máy. Suy luận để tăng tính điện ảnh. VÍ DỤ: Cảnh quan rộng lớn dùng 'wide-angle shot, landscape', mô tả cảm xúc nhân vật dùng 'close-up shot, portrait', thể hiện sự hùng vĩ dùng 'low-angle shot', nhìn tổng quan dùng 'aerial view'.
-   - **Chi tiết, Chất lượng & Tham số:** **LUÔN LUÔN** kết thúc prompt bằng chuỗi sau, bao gồm cả tham số kỹ thuật cho tỷ lệ: ", highly detailed, intricate details, masterpiece, 8k --ar ${aspectRatioValue}".
-
-${characterDefinitions.trim() 
-    ? `3. **Nhất quán nhân vật (Rất quan trọng):** Dưới đây là phần định nghĩa nhân vật do người dùng cung cấp. Nó có thể được viết theo ngôn ngữ tự nhiên, dạng gạch đầu dòng chi tiết, hoặc chỉ là các từ khóa.
-      **Nhiệm vụ của bạn:**
-      - **Đọc và Hiểu:** Phân tích văn bản dưới đây để xác định tên và các đặc điểm hình ảnh cốt lõi của từng nhân vật (ngoại hình, quần áo, vũ khí, các đặc điểm nổi bật).
-      - **Tổng hợp & Chèn:** Khi tên một nhân vật (ví dụ: "Kael", "Lyra") xuất hiện trong \`originalText\` của một phân cảnh, bạn phải tự động **tổng hợp một cụm từ mô tả hình ảnh súc tích** về nhân vật đó và **chèn nó vào \`imagePrompt\`** một cách tự nhiên.
-      - **Tập trung vào hình ảnh:** Hãy bỏ qua các chi tiết không liên quan đến hình ảnh như "Tính cách", "Lịch sử", "Mối quan hệ". Mục tiêu là tạo ra một mô tả hình ảnh nhất quán cho AI tạo ảnh.
-
-      **ĐỊNH NGHĨA NHÂN VẬT ĐỂ PHÂN TÍCH VÀ SỬ DỤNG:**
-      ---
-      ${characterDefinitions}
-      ---`
-    : ""}
-
-${translationLanguage && translationLanguage !== 'none'
-    ? `4. **DỊCH THUẬT (Có điều kiện):** Người dùng đã yêu cầu dịch. Với mỗi phân cảnh, bạn **BẮT BUỘC** phải dịch \`originalText\` sang **${languageMap[translationLanguage] || translationLanguage}**.
-    - Đặt văn bản đã dịch vào một trường mới tên là \`translatedText\`.
-    - Nếu văn bản gốc đã là ${languageMap[translationLanguage] || translationLanguage}, chỉ cần sao chép nó vào trường \`translatedText\`.
-    - Bản dịch phải chính xác và tự nhiên.`
-    : ""}
-
-5. **Tối ưu Tỷ lệ (Sáng tạo):** Ngoài việc thêm tham số kỹ thuật ở trên, hãy để tỷ lệ khung hình **${aspectRatioValue}** ảnh hưởng đến nội dung mô tả của bạn. Ví dụ, với '9:16', hãy mô tả các yếu tố theo chiều dọc. Với '16:9', hãy mô tả cảnh quan rộng.
-
+${imagePromptRules(imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage).replace('**IMAGE PROMPT CREATION RULES (MOST IMPORTANT):**', '**QUY TẮC TẠO PROMPT ẢNH (QUAN TRỌNG NHẤT):**')}
 **KỊCH BẢN ĐỂ PHÂN TÍCH:**
-${scriptText}`,
+${scriptText}`;
+
+
+const enPromptTemplatePrompter = ({ themeName, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, scriptText }: PromptTemplateArgs) => `Analyze the following pre-scened script. Your task is to create image prompts for each scene according to the detailed rules below.
+
+**SCENE PROCESSING RULES:**
+1.  **Scene Definition:** The script is already divided into scenes. **Each block of text separated by one or more blank lines is a distinct scene.**
+2.  **Contextual Theme:** The overall theme for this script is "${themeName}". Use this to guide the mood and style of your visual descriptions and prompt creation.
+3.  **Task:** You do not need to split scenes. Process each given scene sequentially.
+4.  **Output Format:** Return a JSON array following the provided schema, where each object corresponds to a scene from the input script.
+${imagePromptRules(imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage)}
+**PRE-SCENED SCRIPT TO ANALYZE:**
+${scriptText}`;
+
+const viPromptTemplatePrompter = ({ themeName, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, scriptText }: PromptTemplateArgs) => `Phân tích kịch bản đã được phân cảnh sẵn sau đây. Nhiệm vụ của bạn là tạo prompt ảnh cho mỗi phân cảnh theo các quy tắc chi tiết dưới đây.
+
+**QUY TẮC XỬ LÝ PHÂN CẢNH:**
+1.  **Định nghĩa phân cảnh:** Kịch bản đã được chia thành các phân cảnh. **Mỗi đoạn văn bản được ngăn cách bởi một dòng trống được coi là một phân cảnh riêng biệt.**
+2.  **Chủ đề Ngữ cảnh:** Chủ đề tổng thể cho kịch bản này là "${themeName}". Hãy sử dụng thông tin này để định hướng không khí và phong cách cho các mô tả hình ảnh và việc tạo prompt của bạn.
+3.  **Nhiệm vụ:** Bạn không cần phải chia cảnh nữa. Hãy xử lý tuần tự từng phân cảnh đã cho.
+4.  **Định dạng Output:** Trả về một mảng JSON theo schema đã cung cấp, trong đó mỗi object tương ứng với một phân cảnh từ kịch bản đầu vào.
+${imagePromptRules(imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage).replace('**IMAGE PROMPT CREATION RULES (MOST IMPORTANT):**', '**QUY TẮC TẠO PROMPT ẢNH (QUAN TRỌNG NHẤT):**')}
+**KỊCH BẢN ĐÃ PHÂN CẢNH ĐỂ PHÂN TÍCH:**
+${scriptText}`;
+
+
+const promptTemplates: {[key in Language]: (args: PromptTemplateArgs) => string} = {
+  vi: viPromptTemplate,
   en: enPromptTemplate,
   zh: enPromptTemplate,
   ja: enPromptTemplate,
   ko: enPromptTemplate
+};
+
+const promptTemplatesForPrompter: {[key in Language]: (args: PromptTemplateArgs) => string} = {
+  vi: viPromptTemplatePrompter,
+  en: enPromptTemplatePrompter,
+  zh: enPromptTemplatePrompter,
+  ja: enPromptTemplatePrompter,
+  ko: enPromptTemplatePrompter
 };
 
 
@@ -702,6 +765,10 @@ const visualDescSchemaDescriptions: {[key in Language]: string} = {
 
 export const getPromptTemplate = (lang: Language, args: PromptTemplateArgs) => {
     return (promptTemplates[lang] || promptTemplates['en'])(args);
+}
+
+export const getPromptTemplateForPrompter = (lang: Language, args: PromptTemplateArgs) => {
+    return (promptTemplatesForPrompter[lang] || promptTemplatesForPrompter['en'])(args);
 }
 
 export const getVisualDescSchemaDescription = (lang: Language) => {
