@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import { Document, Packer, Paragraph } from 'docx';
@@ -12,6 +13,8 @@ import KeyIcon from './components/icons/KeyIcon';
 import InfoIcon from './components/icons/InfoIcon';
 import { useI18n } from './contexts/I18nContext';
 import LanguageSwitcher from './components/LanguageSwitcher';
+import DonateModal from './components/DonateModal';
+import HeartIcon from './components/icons/HeartIcon';
 
 type AppTab = 'splitter' | 'prompter';
 
@@ -185,6 +188,20 @@ const ResultsView: React.FC<ResultsViewProps> = ({ isLoading, error, scenes, t, 
         });
     }, [scenes, t]);
 
+    const handleDownloadPromptsTXT = useCallback(() => {
+        if (scenes.length === 0) return;
+        const content = scenes.map(scene => scene.imagePrompt).join('\n\n');
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${t('promptsFileName')}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, [scenes, t]);
+
 
     return (
         <div className="mt-12 max-w-4xl mx-auto">
@@ -205,6 +222,9 @@ const ResultsView: React.FC<ResultsViewProps> = ({ isLoading, error, scenes, t, 
                         </button>
                         <button onClick={handleDownloadDOCX} className="inline-flex items-center justify-center px-6 py-2 border border-cyan-500 text-cyan-400 font-bold rounded-full hover:bg-cyan-500/10 transition-colors focus:outline-none focus:ring-4 focus:ring-cyan-300/50">
                             <FileTextIcon className="w-5 h-5 mr-2" />{t('downloadDocxButton')}
+                        </button>
+                         <button onClick={handleDownloadPromptsTXT} className="inline-flex items-center justify-center px-6 py-2 border border-cyan-500 text-cyan-400 font-bold rounded-full hover:bg-cyan-500/10 transition-colors focus:outline-none focus:ring-4 focus:ring-cyan-300/50">
+                            <FileTextIcon className="w-5 h-5 mr-2" />{t('downloadPromptsButton')}
                         </button>
                     </div>
                     <div className="space-y-8">{scenes.map((scene) => (<SceneCard key={scene.sceneNumber} scene={scene} />))}</div>
@@ -602,6 +622,7 @@ const AppContainer = () => {
 
 function App() {
   const { t } = useI18n();
+  const [isDonateModalOpen, setIsDonateModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 font-sans">
@@ -622,7 +643,17 @@ function App() {
 
       <footer className="text-center py-6 text-sm text-gray-600">
         <p dangerouslySetInnerHTML={{ __html: t('footerText') }} />
+        <div className="mt-4">
+            <button
+                onClick={() => setIsDonateModalOpen(true)}
+                className="inline-flex items-center justify-center px-5 py-2 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-rose-500 transition-transform transform hover:scale-105"
+            >
+                <HeartIcon className="w-5 h-5 mr-2" />
+                {t('donateButton')}
+            </button>
+        </div>
       </footer>
+      {isDonateModalOpen && <DonateModal onClose={() => setIsDonateModalOpen(false)} />}
     </div>
   );
 }
