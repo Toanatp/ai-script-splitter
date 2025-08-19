@@ -579,7 +579,7 @@ const AppContainer = () => {
                     <p className="mt-2 flex flex-wrap justify-center items-center gap-x-3 gap-y-1">
                         <a href="https://www.youtube.com/@Bit-Do" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">{t('youtubeLinkText')}</a>
                         <span className="text-gray-600">|</span>
-                        <a href="https://zalo.me/g/ubgxhh983" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">{t('zaloGroupLinkText')}</a>
+                        <a href="https://zalo.me/g/pbscsd639" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">{t('zaloGroupLinkText')}</a>
                         <span className="text-gray-600">|</span>
                         <span>{t('zaloPersonalText')} 0342472776</span>
                     </p>
