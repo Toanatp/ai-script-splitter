@@ -22,6 +22,8 @@ const translations: AllTranslations = {
     // Tabs
     tab_splitter: "Tự động Phân Cảnh & Tạo Prompt",
     tab_prompter: "Tạo Prompt từ Phân Cảnh có sẵn",
+    tab_batch: "Chạy hàng loạt",
+    tab_custom: "Quy tắc tùy chỉnh",
 
     // Form Labels
     apiKeyLabel: "Google AI API Key",
@@ -34,10 +36,13 @@ const translations: AllTranslations = {
     scriptLabel: "Kịch bản chính",
     scriptLabel_prompter: "Kịch bản (đã được phân cảnh)",
     prompter_instructions: "Dán kịch bản đã được chia thành các đoạn. AI sẽ nhận diện mỗi đoạn cách nhau bởi một dòng trống là một phân cảnh riêng biệt để tạo prompt.",
+    includeVisualIdeaLabel: "Bao gồm 'Ý tưởng hình ảnh' trong kết quả",
+    characterDefinitionForTask: "Định nghĩa nhân vật (cho tác vụ này)",
+    customRulesLabel: "Quy tắc phân cảnh tùy chỉnh",
 
 
     // Placeholders & Tooltips
-    apiKeyPlaceholder: "Dán API Key của bạn vào đây",
+    apiKeyPlaceholder: "Nhập một hoặc nhiều API Key, mỗi key một dòng.",
     apiKeyTooltip: "Khóa của bạn được lưu trữ trong bộ nhớ cục bộ của trình duyệt và không bao giờ được gửi đi đâu ngoại trừ API của Google. Lấy khóa của bạn từ Google AI Studio.",
     placeholderScript: "Xin chào các bạn, chào mừng đã quay trở lại với kênh của chúng mình. Trong video ngày hôm nay, chúng ta sẽ cùng nhau khám phá một chủ đề vô cùng thú vị: lịch sử của những chiếc bánh pizza...",
     placeholderCharacters: `Định nghĩa nhân vật (mỗi dòng một nhân vật):\nArion: một chàng trai trẻ tóc bạc, mắt xanh, mặc áo dài màu xanh.\nElara: một nữ pháp sư thông thái với mái tóc trắng dài, tay cầm một cây trượng phát sáng.`,
@@ -45,6 +50,7 @@ const translations: AllTranslations = {
     scriptPlaceholder: "Dán toàn bộ kịch bản của bạn vào đây...",
     scriptPlaceholder_prompter: "Dán kịch bản đã được phân cảnh của bạn vào đây. Mỗi phân cảnh được ngăn cách bởi một dòng trống.",
     scriptPlaceholder_prompter_example: `Tesla mất năm 1943 trong một căn phòng nhỏ, gần như không ai bên cạnh.\n\nÔng để lại hơn 300 bằng sáng chế, cùng hàng loạt sổ tay và ý tưởng, nhưng phần lớn bị lãng quên.\n\nSau khi ông qua đời, FBI đã niêm phong toàn bộ tài liệu nghiên cứu, lo ngại những ý tưởng điên rồ liên quan vũ khí hạt nhân.\n\nPhải đến nửa sau thế kỷ 20, người ta mới bắt đầu nhìn lại. Họ nhận ra Tesla đi trước thời đại cả trăm năm.`,
+    customRulesPlaceholder: "Nhập các quy tắc phân cảnh của bạn ở đây. Ví dụ:\n- Chia thành một cảnh mới mỗi khi có sự thay đổi về bối cảnh (ví dụ: INT. ROOM - DAY).\n- Mỗi cảnh không được dài quá 4 câu.\n- Tạo một cảnh mới khi một nhân vật mới bắt đầu nói.",
 
     // Buttons
     generateButton: "Tạo phân cảnh",
@@ -87,6 +93,8 @@ const translations: AllTranslations = {
     errorUnknown: "Đã xảy ra một lỗi. Vui lòng kiểm tra console để biết chi tiết.",
     errorInvalidResponse: "AI đã trả về một phản hồi không hợp lệ. Điều này có thể do kịch bản quá phức tạp hoặc yêu cầu không rõ ràng. Hãy thử đơn giản hóa nó.",
     errorInvalidRatioFormat: 'Tỷ lệ phải có dạng "số:số", ví dụ: 21:9',
+    errorAllKeysFailed: 'Tất cả API key cung cấp đều không hợp lệ hoặc đã hết hạn mức. Vui lòng kiểm tra lại.',
+    errorCustomRulesRequired: "Vui lòng nhập quy tắc phân cảnh tùy chỉnh.",
 
     // Modal
     modalTitleTheme: "Thêm chủ đề mới",
@@ -101,6 +109,19 @@ const translations: AllTranslations = {
     modalStylePromptPlaceholder: "Ví dụ: 3D Render, Pixar animation style...",
     donateModalTitle: "Ủng hộ nhà phát triển",
     donateBankQrLabel: "Quét QR Chuyển khoản",
+
+    // Batch Processing
+    batchModeLabel: "Chế độ chạy hàng loạt",
+    batchModeIndividual: "Tác vụ riêng lẻ (Kết quả riêng biệt)",
+    batchModeCombined: "Tác vụ kết hợp (Gộp thành một kết quả)",
+    batchGenerateButton: "Chạy hàng loạt",
+    generatingBatchButton: "Đang xử lý...",
+    batchTaskLabel: "Tác vụ",
+    addTaskButton: "+ Thêm tác vụ",
+    removeTaskButton: "Xóa",
+    batchResultsTitle: "Kết quả Tác vụ {taskNumber}",
+    combinedResultsTitle: "Kết quả Tổng hợp",
+    goToTaskResult: "Tới Tác vụ {taskNumber}",
     
     // File Export
     xlsxSheetName: "Phân Cảnh",
@@ -121,7 +142,7 @@ const translations: AllTranslations = {
     zaloPersonalText: "Zalo Cá nhân:",
 
     // Footer
-    footerText: "Bản quyền thuộc về <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. Tham gia <a href='https://zalo.me/g/pbscsd639' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>nhóm Zalo</a> | Liên hệ: 0342472776.",
+    footerText: "Bản quyền thuộc về <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. Tham gia <a href='https://zalo.me/g/ubgxhh983' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>nhóm Zalo</a> | Liên hệ: 0342472776.",
 
     // Default Option Names
     theme_storytelling: "Kể chuyện / Tóm tắt phim",
@@ -174,6 +195,8 @@ const translations: AllTranslations = {
     lang_ko: "한국어",
     tab_splitter: "Auto Scene Split & Prompt",
     tab_prompter: "Prompt from Pre-scened Script",
+    tab_batch: "Batch Processing",
+    tab_custom: "Custom Rules",
     apiKeyLabel: "Google AI API Key",
     durationLabel: "Duration (seconds)",
     themeLabel: "Theme",
@@ -184,7 +207,10 @@ const translations: AllTranslations = {
     scriptLabel: "Main Script",
     scriptLabel_prompter: "Script (Pre-scened)",
     prompter_instructions: "Paste your script, already divided into segments. The AI will recognize each segment separated by a blank line as a distinct scene to generate a prompt for.",
-    apiKeyPlaceholder: "Paste your API Key here",
+    includeVisualIdeaLabel: "Include 'Visual Idea' in results",
+    characterDefinitionForTask: "Character Definition (for this task)",
+    customRulesLabel: "Custom Splitting Rules",
+    apiKeyPlaceholder: "Enter one or more API Keys, one per line.",
     apiKeyTooltip: "Your key is stored in your browser's local storage and is never sent anywhere except to Google's API. Get your key from Google AI Studio.",
     placeholderScript: "Hello everyone, and welcome back to our channel. In today's video, we're going to explore a very interesting topic: the history of pizza...",
     placeholderCharacters: `Define characters (one per line):\nArion: a young man with silver hair, green eyes, wearing a blue tunic.\nElara: a wise sorceress with long white hair, holding a glowing staff.`,
@@ -192,6 +218,7 @@ const translations: AllTranslations = {
     scriptPlaceholder: "Paste your entire script here...",
     scriptPlaceholder_prompter: "Paste your pre-scened script here. Each scene is separated by a blank line.",
     scriptPlaceholder_prompter_example: `Tesla died in 1943 in a small room, almost alone.\n\nHe left behind over 300 patents, numerous notebooks and ideas, but most were forgotten.\n\nAfter his death, the FBI sealed all his research documents, fearing crazy ideas related to nuclear weapons.\n\nIt wasn't until the second half of the 20th century that people began to look back. They realized Tesla was a hundred years ahead of his time.`,
+    customRulesPlaceholder: "Enter your splitting rules here. For example:\n- Split into a new scene whenever the setting changes (e.g., INT. ROOM - DAY).\n- Each scene should not be longer than 4 sentences.\n- Create a new scene when a new character starts speaking.",
     generateButton: "Generate Scenes",
     generatePromptsButton: "Generate Prompts",
     generatingButton: "Analyzing...",
@@ -224,6 +251,8 @@ const translations: AllTranslations = {
     errorUnknown: "An error occurred. Please check the console for details.",
     errorInvalidResponse: "The AI returned an invalid response. This might be due to a very complex script or an unclear request. Try simplifying it.",
     errorInvalidRatioFormat: 'Ratio must be in "number:number" format, e.g., 21:9',
+    errorAllKeysFailed: 'All provided API keys are invalid or rate-limited. Please check your keys.',
+    errorCustomRulesRequired: "Please enter your custom splitting rules.",
     modalTitleTheme: "Add New Theme",
     modalTitleRatio: "Add New Aspect Ratio",
     modalTitleStyle: "Add New Image Style",
@@ -236,6 +265,17 @@ const translations: AllTranslations = {
     modalStylePromptPlaceholder: "e.g., 3D Render, Pixar animation style...",
     donateModalTitle: "Support the Developer",
     donateBankQrLabel: "Scan QR for Bank Transfer",
+    batchModeLabel: "Batch Mode",
+    batchModeIndividual: "Individual Tasks (Separate Outputs)",
+    batchModeCombined: "Combined Task (Single Output)",
+    batchGenerateButton: "Generate Batch",
+    generatingBatchButton: "Processing Batch...",
+    batchTaskLabel: "Task",
+    addTaskButton: "+ Add Task",
+    removeTaskButton: "Remove",
+    batchResultsTitle: "Task {taskNumber} Results",
+    combinedResultsTitle: "Combined Results",
+    goToTaskResult: "Go to Task {taskNumber}",
     xlsxSheetName: "Scenes",
     xlsxFileName: "ScriptScenes",
     txtFileName: "SegmentedScript",
@@ -250,7 +290,7 @@ const translations: AllTranslations = {
     youtubeLinkText: "YouTube Channel",
     zaloGroupLinkText: "Zalo Group",
     zaloPersonalText: "Personal Zalo:",
-    footerText: "Copyright © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. Join <a href='https://zalo.me/g/pbscsd639' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo Group</a> | Contact: 0342472776.",
+    footerText: "Copyright © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. Join <a href='https://zalo.me/g/ubgxhh983' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo Group</a> | Contact: 0342472776.",
     theme_storytelling: "Storytelling / Movie Recap",
     theme_news: "News / Updates",
     theme_science: "Science / Discovery",
@@ -301,6 +341,8 @@ const translations: AllTranslations = {
     lang_ko: "한국어",
     tab_splitter: "自动场景拆分和提示生成",
     tab_prompter: "从预设场景生成提示",
+    tab_batch: "批量处理",
+    tab_custom: "自定义规则",
     apiKeyLabel: "Google AI API 密钥",
     durationLabel: "时长 (秒)",
     themeLabel: "主题",
@@ -311,7 +353,10 @@ const translations: AllTranslations = {
     scriptLabel: "主剧本",
     scriptLabel_prompter: "剧本 (已分场景)",
     prompter_instructions: "粘贴您已分段的剧本。AI会将每个用空行分隔的段落识别为独立的场景来生成提示。",
-    apiKeyPlaceholder: "在此处粘贴您的 API 密钥",
+    includeVisualIdeaLabel: "在结果中包含“视觉构想”",
+    characterDefinitionForTask: "角色定义 (用于此任务)",
+    customRulesLabel: "自定义拆分规则",
+    apiKeyPlaceholder: "在此处输入一个或多个API密钥，每行一个。",
     apiKeyTooltip: "您的密钥存储在浏览器的本地存储中，除了 Google 的 API 之外，绝不会发送到任何地方。从 Google AI Studio 获取您的密钥。",
     placeholderScript: "大家好，欢迎回到我们的频道。在今天的视频中，我们将探讨一个非常有趣的话题：披萨的历史...",
     placeholderCharacters: `定义角色 (每行一个):\n阿瑞安: 一个银发绿眼的年轻男子，穿着蓝色束腰外衣。\n艾拉拉: 一位白发长长的智慧女巫，手持发光法杖。`,
@@ -319,6 +364,7 @@ const translations: AllTranslations = {
     scriptPlaceholder: "在此处粘贴您的完整剧本...",
     scriptPlaceholder_prompter: "在此处粘贴您已分好场景的剧本。每个场景之间用一个空行隔开。",
     scriptPlaceholder_prompter_example: `特斯拉于1943年在一个小房间里去世，几乎无人陪伴。\n\n他留下了300多项专利，无数的笔记本和想法，但大部分都被遗忘了。\n\n他去世后，联邦调查局（FBI）封存了他所有的研究文件，担心其中与核武器有关的疯狂想法。\n\n直到20世纪下半叶，人们才开始重新审视他。他们意识到特斯拉领先于他所在的时代一百年。`,
+    customRulesPlaceholder: "在此处输入您的拆分规则。例如：\n- 每当场景变化时（例如：INT. ROOM - DAY）拆分为新场景。\n- 每个场景不应超过4句话。\n- 当新角色开始说话时创建新场景。",
     generateButton: "生成场景",
     generatePromptsButton: "生成提示",
     generatingButton: "分析中...",
@@ -351,6 +397,8 @@ const translations: AllTranslations = {
     errorUnknown: "发生未知错误。请检查控制台以获取详细信息。",
     errorInvalidResponse: "AI 返回了无效的响应。这可能是由于剧本过于复杂或请求不明确。请尝试简化它。",
     errorInvalidRatioFormat: '宽高比必须是 "数字:数字" 格式，例如: 21:9',
+    errorAllKeysFailed: '所有提供的API密钥均无效或已达到速率限制。请检查您的密钥。',
+    errorCustomRulesRequired: "请输入您的自定义拆分规则。",
     modalTitleTheme: "添加新主题",
     modalTitleRatio: "添加新宽高比",
     modalTitleStyle: "添加新图像风格",
@@ -363,6 +411,17 @@ const translations: AllTranslations = {
     modalStylePromptPlaceholder: "例如: 3D Render, Pixar animation style...",
     donateModalTitle: "支持开发者",
     donateBankQrLabel: "扫描二维码银行转账",
+    batchModeLabel: "批量模式",
+    batchModeIndividual: "独立任务（单独输出）",
+    batchModeCombined: "组合任务（单一输出）",
+    batchGenerateButton: "生成批量",
+    generatingBatchButton: "处理中...",
+    batchTaskLabel: "任务",
+    addTaskButton: "+ 添加任务",
+    removeTaskButton: "移除",
+    batchResultsTitle: "任务 {taskNumber} 结果",
+    combinedResultsTitle: "组合结果",
+    goToTaskResult: "转到任务 {taskNumber}",
     xlsxSheetName: "场景",
     xlsxFileName: "剧本场景",
     txtFileName: "分段剧本",
@@ -377,7 +436,7 @@ const translations: AllTranslations = {
     youtubeLinkText: "YouTube 频道",
     zaloGroupLinkText: "Zalo 群组",
     zaloPersonalText: "个人 Zalo:",
-    footerText: "版权所有 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. 加入 <a href='https://zalo.me/g/pbscsd639' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo 群组</a> | 联系: 0342472776.",
+    footerText: "版权所有 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. 加入 <a href='https://zalo.me/g/ubgxhh983' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo 群组</a> | 联系: 0342472776.",
     theme_storytelling: "故事/电影解说",
     theme_news: "新闻/更新",
     theme_science: "科学/发现",
@@ -428,6 +487,8 @@ const translations: AllTranslations = {
     lang_ko: "한국어",
     tab_splitter: "自動シーン分割＆プロンプト生成",
     tab_prompter: "事前分割済み脚本からプロンプトを生成",
+    tab_batch: "バッチ処理",
+    tab_custom: "カスタムルール",
     apiKeyLabel: "Google AI APIキー",
     durationLabel: "時間 (秒)",
     themeLabel: "テーマ",
@@ -438,7 +499,10 @@ const translations: AllTranslations = {
     scriptLabel: "メイン脚本",
     scriptLabel_prompter: "脚本 (シーン分割済み)",
     prompter_instructions: "既にセグメントに分割された脚本を貼り付けてください。AIは空行で区切られた各セグメントを個別のシーンとして認識し、プロンプトを生成します。",
-    apiKeyPlaceholder: "ここにAPIキーを貼り付けてください",
+    includeVisualIdeaLabel: "結果に「ビジュアルアイデア」を含める",
+    characterDefinitionForTask: "キャラクター定義 (このタスク用)",
+    customRulesLabel: "カスタム分割ルール",
+    apiKeyPlaceholder: "1つ以上のAPIキーを1行に1つずつ入力してください。",
     apiKeyTooltip: "キーはブラウザのローカルストレージに保存され、GoogleのAPI以外には送信されません。Google AI Studioからキーを取得してください。",
     placeholderScript: "皆さん、こんにちは。私たちのチャンネルへようこそ。今日のビデオでは、非常に興味深いトピック、ピザの歴史について探求します...",
     placeholderCharacters: `キャラクターを定義します (1行に1人):\nアリオン: 銀髪で緑色の目をした若い男性、青いチュニックを着用。\nエララ: 長い白髪の賢い魔女、光る杖を持っている。`,
@@ -446,6 +510,7 @@ const translations: AllTranslations = {
     scriptPlaceholder: "ここに脚本全体を貼り付けてください...",
     scriptPlaceholder_prompter: "ここにシーン分割済みの脚本を貼り付けてください。各シーンは空行で区切られます。",
     scriptPlaceholder_prompter_example: `テスラは1943年に小さな部屋で、ほとんど一人で亡くなりました。\n\n彼は300以上の特許、多数のノートやアイデアを残しましたが、そのほとんどは忘れ去られました。\n\n彼の死後、FBIは核兵器に関連する狂気じみたアイデアを恐れて、彼の研究資料をすべて封印しました。\n\n人々が彼を再評価し始めたのは20世紀後半になってからでした。彼らはテスラが時代を100年も先取りしていたことに気づきました。`,
+    customRulesPlaceholder: "ここに分割ルールを入力してください。例：\n- 設定が変わるたびに新しいシーンに分割する（例：INT. ROOM - DAY）。\n- 各シーンは4文を超えないようにする。\n- 新しいキャラクターが話し始めたときに新しいシーンを作成する。",
     generateButton: "シーンを生成",
     generatePromptsButton: "プロンプトを生成",
     generatingButton: "分析中...",
@@ -478,6 +543,8 @@ const translations: AllTranslations = {
     errorUnknown: "不明なエラーが発生しました。詳細はコンソールを確認してください。",
     errorInvalidResponse: "AIが無効な応答を返しました。これは、脚本が複雑すぎるか、リクエストが不明確なことが原因である可能性があります。簡略化してみてください。",
     errorInvalidRatioFormat: 'アスペクト比は "数値:数値" 形式でなければなりません。例: 21:9',
+    errorAllKeysFailed: '提供されたすべてのAPIキーが無効であるか、レート制限に達しています。キーを確認してください。',
+    errorCustomRulesRequired: "カスタム分割ルールを入力してください。",
     modalTitleTheme: "新しいテーマを追加",
     modalTitleRatio: "新しいアスペクト比を追加",
     modalTitleStyle: "新しい画像スタイルを追加",
@@ -490,6 +557,17 @@ const translations: AllTranslations = {
     modalStylePromptPlaceholder: "例: 3D Render, Pixar animation style...",
     donateModalTitle: "開発者を支援",
     donateBankQrLabel: "銀行振込用QRコードをスキャン",
+    batchModeLabel: "バッチモード",
+    batchModeIndividual: "個別タスク（個別出力）",
+    batchModeCombined: "結合タスク（単一出力）",
+    batchGenerateButton: "バッチ生成",
+    generatingBatchButton: "処理中...",
+    batchTaskLabel: "タスク",
+    addTaskButton: "+ タスクを追加",
+    removeTaskButton: "削除",
+    batchResultsTitle: "タスク {taskNumber} の結果",
+    combinedResultsTitle: "結合結果",
+    goToTaskResult: "タスク {taskNumber} へ移動",
     xlsxSheetName: "シーン",
     xlsxFileName: "脚本シーン",
     txtFileName: "分節脚本",
@@ -504,7 +582,7 @@ const translations: AllTranslations = {
     youtubeLinkText: "YouTubeチャンネル",
     zaloGroupLinkText: "Zaloグループ",
     zaloPersonalText: "個人Zalo:",
-    footerText: "著作権 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. <a href='https://zalo.me/g/pbscsd639' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo グループ</a>に参加 | 連絡先: 0342472776.",
+    footerText: "著作権 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. <a href='https://zalo.me/g/ubgxhh983' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo グループ</a>に参加 | 連絡先: 0342472776.",
     theme_storytelling: "物語/映画の要約",
     theme_news: "ニュース/更新情報",
     theme_science: "科学/発見",
@@ -555,6 +633,8 @@ const translations: AllTranslations = {
     lang_ko: "한국어",
     tab_splitter: "자동 장면 분할 및 프롬프트 생성",
     tab_prompter: "미리 나눈 장면에서 프롬프트 생성",
+    tab_batch: "일괄 처리",
+    tab_custom: "사용자 정의 규칙",
     apiKeyLabel: "Google AI API 키",
     durationLabel: "지속 시간 (초)",
     themeLabel: "테마",
@@ -565,7 +645,10 @@ const translations: AllTranslations = {
     scriptLabel: "메인 스크립트",
     scriptLabel_prompter: "스크립트 (장면 분할됨)",
     prompter_instructions: "이미 세그먼트로 나뉜 스크립트를 붙여넣으세요. AI는 빈 줄로 구분된 각 세그먼트를 별개의 장면으로 인식하여 프롬프트를 생성합니다.",
-    apiKeyPlaceholder: "API 키를 여기에 붙여넣으세요",
+    includeVisualIdeaLabel: "결과에 '시각적 아이디어' 포함",
+    characterDefinitionForTask: "캐릭터 정의 (이 작업을 위해)",
+    customRulesLabel: "사용자 정의 분할 규칙",
+    apiKeyPlaceholder: "하나 이상의 API 키를 한 줄에 하나씩 입력하세요.",
     apiKeyTooltip: "키는 브라우저의 로컬 저장소에 저장되며 Google의 API를 제외하고는 어디에도 전송되지 않습니다. Google AI Studio에서 키를 받으세요.",
     placeholderScript: "여러분, 안녕하세요. 저희 채널에 오신 것을 환영합니다. 오늘 영상에서는 매우 흥미로운 주제인 피자의 역사에 대해 알아보겠습니다...",
     placeholderCharacters: `캐릭터 정의 (한 줄에 한 명):\n아리온: 은색 머리카락과 녹색 눈을 가진 젊은 남성, 파란색 튜닉을 입고 있음.\n엘라라: 긴 흰 머리카락을 가진 현명한 마법사, 빛나는 지팡이를 들고 있음.`,
@@ -573,6 +656,7 @@ const translations: AllTranslations = {
     scriptPlaceholder: "여기에 전체 스크립트를 붙여넣으세요...",
     scriptPlaceholder_prompter: "미리 장면을 나눈 스크립트를 여기에 붙여넣으세요. 각 장면은 빈 줄로 구분됩니다.",
     scriptPlaceholder_prompter_example: `테슬라는 1943년 작은 방에서 거의 혼자 사망했습니다.\n\n그는 300개가 넘는 특허, 수많은 노트와 아이디어를 남겼지만 대부분 잊혀졌습니다.\n\n그의 사후 FBI는 핵무기와 관련된 미친 아이디어를 우려하여 그의 모든 연구 문서를 봉인했습니다.\n\n20세기 후반이 되어서야 사람들은 그를 다시 돌아보기 시작했습니다. 그들은 테슬라가 시대를 100년이나 앞서갔다는 것을 깨달았습니다.`,
+    customRulesPlaceholder: "여기에 분할 규칙을 입력하세요. 예:\n- 배경이 바뀔 때마다 새 장면으로 분할 (예: INT. ROOM - DAY).\n- 각 장면은 4문장을 넘지 않아야 합니다.\n- 새 캐릭터가 말하기 시작하면 새 장면을 만듭니다.",
     generateButton: "장면 생성",
     generatePromptsButton: "프롬프트 생성",
     generatingButton: "분석 중...",
@@ -605,6 +689,8 @@ const translations: AllTranslations = {
     errorUnknown: "알 수 없는 오류가 발생했습니다. 자세한 내용은 콘솔을 확인하세요.",
     errorInvalidResponse: "AI가 잘못된 응답을 반환했습니다. 스크립트가 너무 복잡하거나 요청이 명확하지 않기 때문일 수 있습니다. 간단하게 시도해보세요.",
     errorInvalidRatioFormat: '종횡비는 "숫자:숫자" 형식이어야 합니다. 예: 21:9',
+    errorAllKeysFailed: '제공된 모든 API 키가 유효하지 않거나 사용량이 초과되었습니다. 키를 확인하십시오.',
+    errorCustomRulesRequired: "사용자 정의 분할 규칙을 입력하십시오.",
     modalTitleTheme: "새 테마 추가",
     modalTitleRatio: "새 종횡비 추가",
     modalTitleStyle: "새 이미지 스타일 추가",
@@ -617,6 +703,17 @@ const translations: AllTranslations = {
     modalStylePromptPlaceholder: "예: 3D Render, Pixar animation style...",
     donateModalTitle: "개발자 후원",
     donateBankQrLabel: "은행 송금 QR 스캔",
+    batchModeLabel: "일괄 처리 모드",
+    batchModeIndividual: "개별 작업(별도 출력)",
+    batchModeCombined: "결합된 작업(단일 출력)",
+    batchGenerateButton: "일괄 생성",
+    generatingBatchButton: "처리 중...",
+    batchTaskLabel: "작업",
+    addTaskButton: "+ 작업 추가",
+    removeTaskButton: "제거",
+    batchResultsTitle: "작업 {taskNumber} 결과",
+    combinedResultsTitle: "결합된 결과",
+    goToTaskResult: "작업 {taskNumber}로 이동",
     xlsxSheetName: "장면",
     xlsxFileName: "스크립트_장면",
     txtFileName: "분할된_스크립트",
@@ -631,7 +728,7 @@ const translations: AllTranslations = {
     youtubeLinkText: "YouTube 채널",
     zaloGroupLinkText: "Zalo 그룹",
     zaloPersonalText: "개인 Zalo:",
-    footerText: "저작권 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. <a href='https://zalo.me/g/pbscsd639' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo 그룹</a>에 가입 | 연락처: 0342472776.",
+    footerText: "저작권 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. <a href='https://zalo.me/g/ubgxhh983' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo 그룹</a>에 가입 | 연락처: 0342472776.",
     theme_storytelling: "스토리텔링 / 영화 요약",
     theme_news: "뉴스 / 업데이트",
     theme_science: "과학 / 발견",
@@ -680,6 +777,8 @@ type PromptTemplateArgs = {
   aspectRatioValue: string,
   characterDefinitions: string,
   translationLanguage: string,
+  includeVisualIdea: boolean,
+  customRules?: string,
   scriptText: string,
 }
 
@@ -730,27 +829,46 @@ ${translationLanguage && translationLanguage !== 'none'
 `;
 
 
-const enPromptTemplate = ({ duration, themeName, targetWordCount, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, scriptText }: PromptTemplateArgs) => `Analyze the following script. Your task is to split it into scenes and create image prompts according to the detailed rules below.
+const enPromptTemplate = ({ duration, themeName, targetWordCount, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, includeVisualIdea, customRules, scriptText }: PromptTemplateArgs) => `Analyze the following script. Your task is to split it into scenes and create image prompts according to the detailed rules below.
+${includeVisualIdea ? `You will also generate a 'visualDescription' for each scene.` : `You will NOT generate a 'visualDescription' for any scene.`}
 
 **SCENE SPLITTING RULES:**
-1.  **Duration:** Each scene's original text should correspond to a speaking duration of approximately ${duration} seconds. Based on the "${themeName}" theme, estimate the original text length for each scene to be around ${targetWordCount} words. Split at natural pauses.
+${customRules && customRules.trim() ?
+`1.  **USER-DEFINED RULES (HIGHEST PRIORITY):** You MUST follow these rules provided by the user to split the script:
+    ---
+    ${customRules}
+    ---
+`
+:
+`1.  **Duration:** Each scene's original text should correspond to a speaking duration of approximately ${duration} seconds. Based on the "${themeName}" theme, estimate the original text length for each scene to be around ${targetWordCount} words. Split at natural pauses.`
+}
 2.  **Output Format:** Return a JSON array following the provided schema.
 ${imagePromptRules(imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage)}
 **SCRIPT TO ANALYZE:**
 ${scriptText}`;
 
 
-const viPromptTemplate = ({ duration, themeName, targetWordCount, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, scriptText }: PromptTemplateArgs) => `Phân tích kịch bản sau đây. Nhiệm vụ của bạn là chia nó thành các phân cảnh và tạo prompt ảnh theo các quy tắc chi tiết dưới đây.
+const viPromptTemplate = ({ duration, themeName, targetWordCount, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, includeVisualIdea, customRules, scriptText }: PromptTemplateArgs) => `Phân tích kịch bản sau đây. Nhiệm vụ của bạn là chia nó thành các phân cảnh và tạo prompt ảnh theo các quy tắc chi tiết dưới đây.
+${includeVisualIdea ? `Bạn cũng sẽ tạo một 'visualDescription' cho mỗi phân cảnh.` : `Bạn sẽ KHÔNG tạo 'visualDescription' cho bất kỳ phân cảnh nào.`}
 
 **QUY TẮC PHÂN CẢNH:**
-1. **Thời lượng:** Mỗi phân cảnh phải có độ dài văn bản gốc tương ứng với thời lượng nói khoảng ${duration} giây. Dựa trên chủ đề "${themeName}", hãy ước tính độ dài văn bản gốc cho mỗi phân cảnh vào khoảng ${targetWordCount} từ. Chia ở những điểm ngắt nghỉ tự nhiên.
+${customRules && customRules.trim() ?
+`1.  **QUY TẮC DO NGƯỜI DÙNG ĐỊNH NGHĨA (ƯU TIÊN CAO NHẤT):** Bạn BẮT BUỘC phải tuân theo các quy tắc sau do người dùng cung cấp để chia kịch bản:
+    ---
+    ${customRules}
+    ---
+`
+:
+`1. **Thời lượng:** Mỗi phân cảnh phải có độ dài văn bản gốc tương ứng với thời lượng nói khoảng ${duration} giây. Dựa trên chủ đề "${themeName}", hãy ước tính độ dài văn bản gốc cho mỗi phân cảnh vào khoảng ${targetWordCount} từ. Chia ở những điểm ngắt nghỉ tự nhiên.`
+}
 2. **Định dạng Output:** Trả về một mảng JSON theo schema đã cung cấp.
 ${imagePromptRules(imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage).replace('**IMAGE PROMPT CREATION RULES (MOST IMPORTANT):**', '**QUY TẮC TẠO PROMPT ẢNH (QUAN TRỌNG NHẤT):**')}
 **KỊCH BẢN ĐỂ PHÂN TÍCH:**
 ${scriptText}`;
 
 
-const enPromptTemplatePrompter = ({ themeName, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, scriptText }: PromptTemplateArgs) => `Analyze the following pre-scened script. Your task is to create image prompts for each scene according to the detailed rules below.
+const enPromptTemplatePrompter = ({ themeName, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, includeVisualIdea, scriptText }: PromptTemplateArgs) => `Analyze the following pre-scened script. Your task is to create image prompts for each scene according to the detailed rules below.
+${includeVisualIdea ? `You will also generate a 'visualDescription' for each scene.` : `You will NOT generate a 'visualDescription' for any scene.`}
 
 **SCENE PROCESSING RULES:**
 1.  **Scene Definition:** The script is already divided into scenes. **Each block of text separated by one or more blank lines is a distinct scene.**
@@ -761,7 +879,8 @@ ${imagePromptRules(imageStylePrompt, aspectRatioValue, characterDefinitions, tra
 **PRE-SCENED SCRIPT TO ANALYZE:**
 ${scriptText}`;
 
-const viPromptTemplatePrompter = ({ themeName, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, scriptText }: PromptTemplateArgs) => `Phân tích kịch bản đã được phân cảnh sẵn sau đây. Nhiệm vụ của bạn là tạo prompt ảnh cho mỗi phân cảnh theo các quy tắc chi tiết dưới đây.
+const viPromptTemplatePrompter = ({ themeName, imageStylePrompt, aspectRatioValue, characterDefinitions, translationLanguage, includeVisualIdea, scriptText }: PromptTemplateArgs) => `Phân tích kịch bản đã được phân cảnh sẵn sau đây. Nhiệm vụ của bạn là tạo prompt ảnh cho mỗi phân cảnh theo các quy tắc chi tiết dưới đây.
+${includeVisualIdea ? `Bạn cũng sẽ tạo một 'visualDescription' cho mỗi phân cảnh.` : `Bạn sẽ KHÔNG tạo 'visualDescription' cho bất kỳ phân cảnh nào.`}
 
 **QUY TẮC XỬ LÝ PHÂN CẢNH:**
 1.  **Định nghĩa phân cảnh:** Kịch bản đã được chia thành các phân cảnh. **Mỗi đoạn văn bản được ngăn cách bởi một dòng trống được coi là một phân cảnh riêng biệt.**

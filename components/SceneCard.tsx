@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import type { Scene } from '../types';
 import CopyIcon from './icons/CopyIcon';
@@ -39,10 +38,12 @@ const SceneCard: React.FC<SceneCardProps> = ({ scene }) => {
             </p>
           </div>
         )}
-        <div>
-          <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">{t('sceneCardVisualIdea')}</h4>
-          <p className="text-gray-300">{scene.visualDescription}</p>
-        </div>
+        {scene.visualDescription && (
+          <div>
+            <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">{t('sceneCardVisualIdea')}</h4>
+            <p className="text-gray-300">{scene.visualDescription}</p>
+          </div>
+        )}
         <div>
           <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">{t('sceneCardImagePrompt')}</h4>
           <div className="relative bg-gray-900 rounded-md p-4 border border-gray-700">

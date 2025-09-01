@@ -26,6 +26,6 @@ export interface Scene {
   sceneNumber: number;
   originalText: string;
   translatedText?: string;
-  visualDescription: string;
+  visualDescription?: string;
   imagePrompt: string;
 }

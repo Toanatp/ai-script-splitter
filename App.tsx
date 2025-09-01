@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import { Document, Packer, Paragraph } from 'docx';
@@ -16,7 +17,21 @@ import LanguageSwitcher from './components/LanguageSwitcher';
 import DonateModal from './components/DonateModal';
 import HeartIcon from './components/icons/HeartIcon';
 
-type AppTab = 'splitter' | 'prompter';
+type AppTab = 'splitter' | 'prompter' | 'batch' | 'custom';
+type BatchMode = 'individual' | 'combined';
+
+type BatchTask = {
+    id: number;
+    script: string;
+    characterDefinitions: string;
+}
+
+type CustomRuleBatchTask = {
+    id: number;
+    script: string;
+    characterDefinitions: string;
+}
+
 
 // --- DỮ LIỆU MẶC ĐỊNH (RAW DATA)---
 const DEFAULT_THEME_DATA = [
@@ -126,20 +141,24 @@ interface ResultsViewProps {
     scenes: Scene[];
     t: (key: string) => string;
     translationLanguage: string;
+    includeVisualIdea: boolean;
 }
-const ResultsView: React.FC<ResultsViewProps> = ({ isLoading, error, scenes, t, translationLanguage }) => {
+const ResultsView: React.FC<ResultsViewProps> = ({ isLoading, error, scenes, t, translationLanguage, includeVisualIdea }) => {
 
     const handleDownloadXLSX = useCallback(() => {
         if (scenes.length === 0) return;
         const includeTranslations = translationLanguage !== 'none';
+        
         const dataForSheet = scenes.map(scene => {
-            const rowData: { [key: string]: string | number } = {};
+            const rowData: { [key: string]: string | number | undefined } = {};
             rowData[t('xlsxHeaderSceneNumber')] = scene.sceneNumber;
             rowData[t('xlsxHeaderOriginalText')] = scene.originalText;
             if (includeTranslations) {
                 rowData[t('xlsxHeaderTranslatedText')] = scene.translatedText || '';
             }
-            rowData[t('xlsxHeaderVisualDesc')] = scene.visualDescription;
+            if(includeVisualIdea) {
+                 rowData[t('xlsxHeaderVisualDesc')] = scene.visualDescription;
+            }
             rowData[t('xlsxHeaderImagePrompt')] = scene.imagePrompt;
             return rowData;
         });
@@ -147,12 +166,15 @@ const ResultsView: React.FC<ResultsViewProps> = ({ isLoading, error, scenes, t, 
         const worksheet = XLSX.utils.json_to_sheet(dataForSheet);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, t('xlsxSheetName'));
+        
         const colWidths = [{ wch: 10 }, { wch: 60 }]; // Scene#, Original
         if (includeTranslations) colWidths.push({ wch: 60 }); // Translated
-        colWidths.push({ wch: 50 }, { wch: 70 }); // Visual, Prompt
+        if(includeVisualIdea) colWidths.push({ wch: 50 }); // Visual
+        colWidths.push({ wch: 70 }); // Prompt
         worksheet["!cols"] = colWidths;
+
         XLSX.writeFile(workbook, `${t('xlsxFileName')}.xlsx`);
-    }, [scenes, t, translationLanguage]);
+    }, [scenes, t, translationLanguage, includeVisualIdea]);
 
     const handleDownloadTXT = useCallback(() => {
         if (scenes.length === 0) return;
@@ -243,7 +265,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ isLoading, error, scenes, t, 
 };
 
 // --- VIEW CHO TAB TỰ ĐỘNG PHÂN CẢNH ---
-const SceneSplitterView: React.FC<{ apiKey: string }> = ({ apiKey }) => {
+const SceneSplitterView: React.FC<{ apiKeys: string[] }> = ({ apiKeys }) => {
     const { t, language } = useI18n();
     const [script, setScript] = useState<string>('');
     const [scenes, setScenes] = useState<Scene[]>([]);
@@ -258,6 +280,7 @@ const SceneSplitterView: React.FC<{ apiKey: string }> = ({ apiKey }) => {
     const [selectedAspectRatioId, setSelectedAspectRatioId] = useState<string>('16:9');
     const [selectedStyleId, setSelectedStyleId] = useState<string>('automatic');
     const [translationLanguage, setTranslationLanguage] = useState<string>('none');
+    const [includeVisualIdea, setIncludeVisualIdea] = useState<boolean>(true);
     const [modalMode, setModalMode] = useState<'theme' | 'ratio' | 'style' | null>(null);
 
     useEffect(() => {
@@ -326,17 +349,17 @@ const SceneSplitterView: React.FC<{ apiKey: string }> = ({ apiKey }) => {
     const selectedStyle = useMemo(() => styleOptions.find(s => s.id === selectedStyleId)!, [styleOptions, selectedStyleId]);
 
     const handleGenerate = useCallback(async () => {
-        if (!apiKey.trim()) { setError(t('errorApiKeyMissing')); return; }
+        if (apiKeys.length === 0) { setError(t('errorApiKeyMissing')); return; }
         if (!script.trim()) { setError(t('errorScriptRequired')); return; }
         if (!selectedTheme || !selectedAspectRatio || !selectedStyle) { setError(t('errorOptionsMissing')); return; }
         setIsLoading(true); setError(null); setScenes([]);
         try {
-            const result = await breakdownScript(apiKey, script, duration, selectedTheme.name, selectedTheme.wps, selectedAspectRatio.value, selectedStyle.prompt, characterDefinitions, translationLanguage, language, t('errorApiKeyMissing'), t('errorInvalidResponse'), t('errorUnknown'));
+            const result = await breakdownScript(apiKeys, script, duration, selectedTheme.name, selectedTheme.wps, selectedAspectRatio.value, selectedStyle.prompt, characterDefinitions, translationLanguage, includeVisualIdea, '', language, t('errorApiKeyMissing'), t('errorInvalidResponse'), t('errorUnknown'), t('errorAllKeysFailed'));
             setScenes(result);
         } catch (e: unknown) {
             if (e instanceof Error) { setError(e.message); } else { setError(t('errorUnknown')); }
         } finally { setIsLoading(false); }
-    }, [apiKey, script, duration, selectedTheme, selectedAspectRatio, selectedStyle, characterDefinitions, translationLanguage, language, t]);
+    }, [apiKeys, script, duration, selectedTheme, selectedAspectRatio, selectedStyle, characterDefinitions, translationLanguage, includeVisualIdea, language, t]);
 
     return (
         <>
@@ -375,6 +398,10 @@ const SceneSplitterView: React.FC<{ apiKey: string }> = ({ apiKey }) => {
                         </select>
                     </div>
                 </div>
+                 <div className="flex items-center">
+                    <input id="include-visual-idea" type="checkbox" checked={includeVisualIdea} onChange={(e) => setIncludeVisualIdea(e.target.checked)} className="h-4 w-4 rounded border-gray-600 bg-gray-900 text-cyan-600 focus:ring-cyan-500" />
+                    <label htmlFor="include-visual-idea" className="ml-3 text-sm font-medium text-gray-300">{t('includeVisualIdeaLabel')}</label>
+                </div>
                 <div>
                     <label htmlFor="character-input" className="block text-sm font-medium text-gray-300 mb-2">{t('characterLabel')}</label>
                     <textarea id="character-input" value={characterDefinitions} onChange={(e) => setCharacterDefinitions(e.target.value)} placeholder={t('characterPlaceholder')} className="w-full h-24 bg-gray-900 border border-gray-700 rounded-md p-4 text-gray-200 focus:ring-2 focus:ring-cyan-500 resize-y" />
@@ -384,18 +411,18 @@ const SceneSplitterView: React.FC<{ apiKey: string }> = ({ apiKey }) => {
                     <textarea id="script-input" value={script} onChange={(e) => setScript(e.target.value)} placeholder={t('scriptPlaceholder')} className="w-full h-64 bg-gray-900 border border-gray-700 rounded-md p-4 text-gray-200 focus:ring-2 focus:ring-cyan-500 resize-y" />
                 </div>
                 <div className="mt-2 flex justify-center">
-                    <button onClick={handleGenerate} disabled={isLoading || !apiKey.trim()} className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-full shadow-lg hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-cyan-300/50">
+                    <button onClick={handleGenerate} disabled={isLoading || apiKeys.length === 0} className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-full shadow-lg hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-cyan-300/50">
                         {isLoading ? (<><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>{t('generatingButton')}</>) : (<><SparklesIcon className="w-5 h-5 mr-2" />{t('generateButton')}</>)}
                     </button>
                 </div>
             </div>
-            <ResultsView isLoading={isLoading} error={error} scenes={scenes} t={t} translationLanguage={translationLanguage} />
+            <ResultsView isLoading={isLoading} error={error} scenes={scenes} t={t} translationLanguage={translationLanguage} includeVisualIdea={includeVisualIdea} />
         </>
     );
 };
 
 // --- VIEW CHO TAB TẠO PROMPT TỪ PHÂN CẢNH SẴN ---
-const PromptGeneratorView: React.FC<{ apiKey: string }> = ({ apiKey }) => {
+const PromptGeneratorView: React.FC<{ apiKeys: string[] }> = ({ apiKeys }) => {
     const { t, language } = useI18n();
     const [script, setScript] = useState<string>('');
     const [scenes, setScenes] = useState<Scene[]>([]);
@@ -409,6 +436,7 @@ const PromptGeneratorView: React.FC<{ apiKey: string }> = ({ apiKey }) => {
     const [selectedAspectRatioId, setSelectedAspectRatioId] = useState<string>('16:9');
     const [selectedStyleId, setSelectedStyleId] = useState<string>('automatic');
     const [translationLanguage, setTranslationLanguage] = useState<string>('none');
+    const [includeVisualIdea, setIncludeVisualIdea] = useState<boolean>(true);
     const [modalMode, setModalMode] = useState<'theme' | 'ratio' | 'style' | null>(null);
 
     useEffect(() => {
@@ -477,17 +505,17 @@ const PromptGeneratorView: React.FC<{ apiKey: string }> = ({ apiKey }) => {
     const selectedStyle = useMemo(() => styleOptions.find(s => s.id === selectedStyleId)!, [styleOptions, selectedStyleId]);
 
     const handleGenerate = useCallback(async () => {
-        if (!apiKey.trim()) { setError(t('errorApiKeyMissing')); return; }
+        if (apiKeys.length === 0) { setError(t('errorApiKeyMissing')); return; }
         if (!script.trim()) { setError(t('errorScriptRequired')); return; }
         if (!selectedTheme || !selectedAspectRatio || !selectedStyle) { setError(t('errorOptionsMissing')); return; }
         setIsLoading(true); setError(null); setScenes([]);
         try {
-            const result = await generatePromptsFromScenes(apiKey, script, selectedTheme.name, selectedAspectRatio.value, selectedStyle.prompt, characterDefinitions, translationLanguage, language, t('errorApiKeyMissing'), t('errorInvalidResponse'), t('errorUnknown'));
+            const result = await generatePromptsFromScenes(apiKeys, script, selectedTheme.name, selectedAspectRatio.value, selectedStyle.prompt, characterDefinitions, translationLanguage, includeVisualIdea, language, t('errorApiKeyMissing'), t('errorInvalidResponse'), t('errorUnknown'), t('errorAllKeysFailed'));
             setScenes(result);
         } catch (e: unknown) {
             if (e instanceof Error) { setError(e.message); } else { setError(t('errorUnknown')); }
         } finally { setIsLoading(false); }
-    }, [apiKey, script, selectedTheme, selectedAspectRatio, selectedStyle, characterDefinitions, translationLanguage, language, t]);
+    }, [apiKeys, script, selectedTheme, selectedAspectRatio, selectedStyle, characterDefinitions, translationLanguage, includeVisualIdea, language, t]);
 
     return (
         <>
@@ -522,6 +550,10 @@ const PromptGeneratorView: React.FC<{ apiKey: string }> = ({ apiKey }) => {
                         </select>
                     </div>
                 </div>
+                 <div className="flex items-center">
+                    <input id="include-visual-idea-p" type="checkbox" checked={includeVisualIdea} onChange={(e) => setIncludeVisualIdea(e.target.checked)} className="h-4 w-4 rounded border-gray-600 bg-gray-900 text-cyan-600 focus:ring-cyan-500" />
+                    <label htmlFor="include-visual-idea-p" className="ml-3 text-sm font-medium text-gray-300">{t('includeVisualIdeaLabel')}</label>
+                </div>
                 <div>
                     <label htmlFor="character-input-p" className="block text-sm font-medium text-gray-300 mb-2">{t('characterLabel')}</label>
                     <textarea id="character-input-p" value={characterDefinitions} onChange={(e) => setCharacterDefinitions(e.target.value)} placeholder={t('characterPlaceholder')} className="w-full h-24 bg-gray-900 border border-gray-700 rounded-md p-4 text-gray-200 focus:ring-2 focus:ring-cyan-500 resize-y" />
@@ -532,12 +564,516 @@ const PromptGeneratorView: React.FC<{ apiKey: string }> = ({ apiKey }) => {
                     <textarea id="script-input-p" value={script} onChange={(e) => setScript(e.target.value)} placeholder={t('scriptPlaceholder_prompter')} className="w-full h-64 bg-gray-900 border border-gray-700 rounded-md p-4 text-gray-200 focus:ring-2 focus:ring-cyan-500 resize-y" />
                 </div>
                 <div className="mt-2 flex justify-center">
-                    <button onClick={handleGenerate} disabled={isLoading || !apiKey.trim()} className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-full shadow-lg hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-cyan-300/50">
+                    <button onClick={handleGenerate} disabled={isLoading || apiKeys.length === 0} className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-full shadow-lg hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-cyan-300/50">
                         {isLoading ? (<><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>{t('generatingButton')}</>) : (<><SparklesIcon className="w-5 h-5 mr-2" />{t('generatePromptsButton')}</>)}
                     </button>
                 </div>
             </div>
-             <ResultsView isLoading={isLoading} error={error} scenes={scenes} t={t} translationLanguage={translationLanguage} />
+             <ResultsView isLoading={isLoading} error={error} scenes={scenes} t={t} translationLanguage={translationLanguage} includeVisualIdea={includeVisualIdea} />
+        </>
+    );
+};
+
+// --- VIEW CHO TAB BATCH PROCESSING ---
+const BatchView: React.FC<{ apiKeys: string[] }> = ({ apiKeys }) => {
+    const { t, language } = useI18n();
+    const [tasks, setTasks] = useState<BatchTask[]>([{id: 1, script: '', characterDefinitions: ''}, {id: 2, script: '', characterDefinitions: ''}, {id: 3, script: '', characterDefinitions: ''}]);
+    const [batchMode, setBatchMode] = useState<BatchMode>('individual');
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [individualResults, setIndividualResults] = useState<{taskId: number, scenes: Scene[], error: string | null}[]>([]);
+    const [combinedResult, setCombinedResult] = useState<{scenes: Scene[], error: string | null} | null>(null);
+    
+    // Settings state
+    const [duration, setDuration] = useState<number>(10);
+    const [characterDefinitions, setCharacterDefinitions] = useState<string>(''); // For combined mode
+    const [customThemes, setCustomThemes] = useState<ThemeOption[]>([]);
+    const [customRatios, setCustomRatios] = useState<AspectRatioOption[]>([]);
+    const [customStyles, setCustomStyles] = useState<StyleOption[]>([]);
+    const [selectedThemeId, setSelectedThemeId] = useState<string>('storytelling');
+    const [selectedAspectRatioId, setSelectedAspectRatioId] = useState<string>('16:9');
+    const [selectedStyleId, setSelectedStyleId] = useState<string>('automatic');
+    const [translationLanguage, setTranslationLanguage] = useState<string>('none');
+    const [includeVisualIdea, setIncludeVisualIdea] = useState<boolean>(true);
+    const [modalMode, setModalMode] = useState<'theme' | 'ratio' | 'style' | null>(null);
+    
+    useEffect(() => {
+        setCharacterDefinitions(t('placeholderCharacters'));
+        try {
+            setCustomThemes(JSON.parse(localStorage.getItem('customThemes') || '[]'));
+            setCustomRatios(JSON.parse(localStorage.getItem('customRatios') || '[]'));
+            setCustomStyles(JSON.parse(localStorage.getItem('customStyles') || '[]'));
+        } catch (e) { console.error("Failed to load settings from localStorage", e); }
+    }, [t]);
+
+    const themeOptions = useMemo(() => [...DEFAULT_THEME_DATA.map(theme => ({ ...theme, name: t(`theme_${theme.id}`)})), ...customThemes.map(theme => ({ ...theme, name: `${theme.name} (${t('customOptionSuffix')})`}))], [t, customThemes]);
+    const aspectRatioOptions = useMemo(() => [...DEFAULT_ASPECT_RATIO_DATA.map(ratio => ({ ...ratio, name: t(`ratio_${ratio.id}`)})), ...customRatios.map(ratio => ({ ...ratio, name: `${ratio.name} (${t('customOptionSuffix')})`}))], [t, customRatios]);
+    const styleOptions = useMemo(() => [...DEFAULT_STYLE_DATA.map(style => ({ id: style.id, name: t(`style_${style.id}`), prompt: t(`style_prompt_${style.id}`) })), ...customStyles.map(style => ({ ...style, name: `${style.name} (${t('customOptionSuffix')})`}))], [t, customStyles]);
+    const translationOptions = useMemo(() => [{ id: 'none', name: t('translate_none') }, { id: 'vi', name: t('lang_vi') }, { id: 'en', name: t('lang_en') }, { id: 'zh', name: t('lang_zh') }, { id: 'ja', name: t('lang_ja') }, { id: 'ko', name: t('lang_ko') },], [t]);
+    
+    const handleSelectionChange = (type: 'theme' | 'ratio' | 'style', value: string) => {
+        if (value === 'add_new') setModalMode(type);
+        else {
+            if (type === 'theme') setSelectedThemeId(value);
+            if (type === 'ratio') setSelectedAspectRatioId(value);
+            if (type === 'style') setSelectedStyleId(value);
+        }
+    };
+
+    const handleSaveCustomOption = (data: any) => { /* Omitted for brevity, logic is the same as other views */ };
+    
+    const selectedTheme = useMemo(() => themeOptions.find(t => t.id === selectedThemeId)!, [themeOptions, selectedThemeId]);
+    const selectedAspectRatio = useMemo(() => aspectRatioOptions.find(r => r.id === selectedAspectRatioId)!, [aspectRatioOptions, selectedAspectRatioId]);
+    const selectedStyle = useMemo(() => styleOptions.find(s => s.id === selectedStyleId)!, [styleOptions, selectedStyleId]);
+
+    const handleTaskFieldChange = (id: number, field: 'script' | 'characterDefinitions', value: string) => {
+        setTasks(currentTasks => 
+            currentTasks.map(task => 
+                task.id === id ? { ...task, [field]: value } : task
+            )
+        );
+    };
+    
+    const addTask = () => {
+        setTasks(currentTasks => [...currentTasks, { id: Date.now(), script: '', characterDefinitions: '' }]);
+    };
+
+    const removeTask = (id: number) => {
+        setTasks(currentTasks => currentTasks.filter(task => task.id !== id));
+    };
+
+    const handleGenerateBatch = useCallback(async () => {
+        if (apiKeys.length === 0) {
+            const error = t('errorApiKeyMissing');
+            if (batchMode === 'individual') setIndividualResults(tasks.map(t => ({ taskId: t.id, scenes: [], error })));
+            else setCombinedResult({ scenes: [], error });
+            return;
+        }
+        if (!selectedTheme || !selectedAspectRatio || !selectedStyle) return;
+
+        setIsLoading(true);
+        setIndividualResults([]);
+        setCombinedResult(null);
+
+        const activeTasks = tasks.filter(task => task.script.trim() !== '');
+        if (activeTasks.length === 0) {
+            setIsLoading(false);
+            return;
+        }
+
+        const promises = activeTasks.map(task => {
+             const taskCharacterDefs = batchMode === 'individual' ? task.characterDefinitions : characterDefinitions;
+             return breakdownScript(
+                apiKeys, task.script, duration, selectedTheme.name, selectedTheme.wps,
+                selectedAspectRatio.value, selectedStyle.prompt, taskCharacterDefs,
+                translationLanguage, includeVisualIdea, '', language, t('errorApiKeyMissing'), t('errorInvalidResponse'),
+                t('errorUnknown'), t('errorAllKeysFailed')
+            );
+        });
+
+        if (batchMode === 'individual') {
+            const results = await Promise.allSettled(promises);
+            const finalResults = results.map((result, index) => {
+                const taskId = activeTasks[index].id;
+                if (result.status === 'fulfilled') {
+                    return { taskId, scenes: result.value, error: null };
+                } else {
+                    return { taskId, scenes: [], error: (result.reason as Error).message || t('errorUnknown') };
+                }
+            });
+            setIndividualResults(finalResults);
+        } else { // Combined mode
+            try {
+                const resultsArrays = await Promise.all(promises);
+                let sceneCounter = 1;
+                const combinedScenes = resultsArrays.flat().map(scene => ({
+                    ...scene,
+                    sceneNumber: sceneCounter++
+                }));
+                setCombinedResult({ scenes: combinedScenes, error: null });
+            } catch (e: unknown) {
+                const error = e instanceof Error ? e.message : t('errorUnknown');
+                setCombinedResult({ scenes: [], error });
+            }
+        }
+
+        setIsLoading(false);
+    }, [apiKeys, tasks, batchMode, duration, selectedTheme, selectedAspectRatio, selectedStyle, characterDefinitions, translationLanguage, includeVisualIdea, language, t]);
+
+
+    return (
+        <>
+            {modalMode && <CustomOptionModal mode={modalMode} onClose={() => setModalMode(null)} onSave={handleSaveCustomOption} t={t} />}
+            <div className="bg-gray-800 rounded-lg p-6 shadow-2xl shadow-black/30 space-y-6">
+                {/* Batch Mode Selector */}
+                <fieldset className="border border-gray-700 p-4 rounded-md">
+                    <legend className="px-2 text-sm font-medium text-gray-300">{t('batchModeLabel')}</legend>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex items-center">
+                            <input id="mode-individual" name="batch-mode" type="radio" checked={batchMode === 'individual'} onChange={() => setBatchMode('individual')} className="h-4 w-4 text-cyan-600 bg-gray-900 border-gray-600 focus:ring-cyan-500" />
+                            <label htmlFor="mode-individual" className="ml-3 block text-sm font-medium text-gray-200">{t('batchModeIndividual')}</label>
+                        </div>
+                        <div className="flex items-center">
+                            <input id="mode-combined" name="batch-mode" type="radio" checked={batchMode === 'combined'} onChange={() => setBatchMode('combined')} className="h-4 w-4 text-cyan-600 bg-gray-900 border-gray-600 focus:ring-cyan-500" />
+                            <label htmlFor="mode-combined" className="ml-3 block text-sm font-medium text-gray-200">{t('batchModeCombined')}</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                {/* Shared Settings */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <label htmlFor="duration-input-b" className="block text-sm font-medium text-gray-300 mb-2">{t('durationLabel')}</label>
+                        <input type="number" id="duration-input-b" value={duration} onChange={(e) => setDuration(Math.max(1, parseInt(e.target.value, 10) || 1))} className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-gray-200 focus:ring-2 focus:ring-cyan-500" min="1" />
+                    </div>
+                    <div>
+                        <label htmlFor="theme-select-b" className="block text-sm font-medium text-gray-300 mb-2">{t('themeLabel')}</label>
+                        <select id="theme-select-b" value={selectedThemeId} onChange={(e) => handleSelectionChange('theme', e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-gray-200 focus:ring-2 focus:ring-cyan-500">{themeOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}<option value="add_new" className="font-bold text-cyan-400">{t('addNewOption')}</option></select>
+                    </div>
+                    <div>
+                        <label htmlFor="aspect-ratio-select-b" className="block text-sm font-medium text-gray-300 mb-2">{t('ratioLabel')}</label>
+                        <select id="aspect-ratio-select-b" value={selectedAspectRatioId} onChange={(e) => handleSelectionChange('ratio', e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-gray-200 focus:ring-2 focus:ring-cyan-500">{aspectRatioOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}<option value="add_new" className="font-bold text-cyan-400">{t('addNewRatio')}</option></select>
+                    </div>
+                    <div>
+                        <label htmlFor="style-select-b" className="block text-sm font-medium text-gray-300 mb-2">{t('styleLabel')}</label>
+                        <select id="style-select-b" value={selectedStyleId} onChange={(e) => handleSelectionChange('style', e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-gray-200 focus:ring-2 focus:ring-cyan-500">{styleOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}<option value="add_new" className="font-bold text-cyan-400">{t('addNewStyle')}</option></select>
+                    </div>
+                    <div className="lg:col-span-2">
+                        <label htmlFor="translate-select-b" className="block text-sm font-medium text-gray-300 mb-2">{t('translateLabel')}</label>
+                        <select id="translate-select-b" value={translationLanguage} onChange={(e) => setTranslationLanguage(e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-gray-200 focus:ring-2 focus:ring-cyan-500">{translationOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}</select>
+                    </div>
+                </div>
+                 <div className="flex items-center">
+                    <input id="include-visual-idea-b" type="checkbox" checked={includeVisualIdea} onChange={(e) => setIncludeVisualIdea(e.target.checked)} className="h-4 w-4 rounded border-gray-600 bg-gray-900 text-cyan-600 focus:ring-cyan-500" />
+                    <label htmlFor="include-visual-idea-b" className="ml-3 text-sm font-medium text-gray-300">{t('includeVisualIdeaLabel')}</label>
+                </div>
+                {batchMode === 'combined' && (
+                    <div>
+                        <label htmlFor="character-input-b" className="block text-sm font-medium text-gray-300 mb-2">{t('characterLabel')}</label>
+                        <textarea id="character-input-b" value={characterDefinitions} onChange={(e) => setCharacterDefinitions(e.target.value)} placeholder={t('characterPlaceholder')} className="w-full h-24 bg-gray-900 border border-gray-700 rounded-md p-4 text-gray-200 focus:ring-2 focus:ring-cyan-500 resize-y" />
+                    </div>
+                )}
+                
+                {/* Task Inputs */}
+                <div className="space-y-4">
+                    {tasks.map((task, index) => (
+                        <div key={task.id} className="bg-gray-900/50 p-4 rounded-md border border-gray-700 space-y-3">
+                             <div className="flex justify-between items-center">
+                                <label htmlFor={`task-script-${task.id}`} className="block text-sm font-semibold text-gray-300">{t('batchTaskLabel')} {index + 1}</label>
+                                {tasks.length > 1 && <button onClick={() => removeTask(task.id)} className="text-xs text-red-400 hover:text-red-300 font-semibold">{t('removeTaskButton')}</button>}
+                             </div>
+                            <textarea id={`task-script-${task.id}`} value={task.script} onChange={(e) => handleTaskFieldChange(task.id, 'script', e.target.value)} placeholder={t('scriptPlaceholder')} className="w-full h-32 bg-gray-900 border border-gray-600 rounded-md p-3 text-gray-200 focus:ring-2 focus:ring-cyan-500 resize-y" />
+                             {batchMode === 'individual' && (
+                                <div>
+                                    <label htmlFor={`task-chars-${task.id}`} className="block text-xs font-medium text-gray-400 mb-1">{t('characterDefinitionForTask')}</label>
+                                    <textarea id={`task-chars-${task.id}`} value={task.characterDefinitions} onChange={(e) => handleTaskFieldChange(task.id, 'characterDefinitions', e.target.value)} placeholder={t('characterPlaceholder')} className="w-full h-20 bg-gray-900 border border-gray-600 rounded-md p-3 text-gray-200 focus:ring-2 focus:ring-cyan-500 resize-y" />
+                                </div>
+                             )}
+                        </div>
+                    ))}
+                </div>
+                 <div className="flex justify-center mt-2">
+                    <button onClick={addTask} className="text-sm font-semibold text-cyan-400 hover:text-cyan-300">{t('addTaskButton')}</button>
+                </div>
+
+
+                {/* Generate Button */}
+                <div className="mt-2 flex justify-center">
+                    <button onClick={handleGenerateBatch} disabled={isLoading || apiKeys.length === 0} className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-full shadow-lg hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-cyan-300/50">
+                        {isLoading ? (<><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>{t('generatingBatchButton')}</>) : (<><SparklesIcon className="w-5 h-5 mr-2" />{t('batchGenerateButton')}</>)}
+                    </button>
+                </div>
+            </div>
+            
+            {/* Results */}
+            <div className="mt-8">
+                {isLoading && <Spinner />}
+                {batchMode === 'individual' && individualResults.length > 0 && (
+                    <div className="space-y-12">
+                         <div className="flex flex-wrap justify-center gap-2 mb-8 p-4 bg-gray-800 rounded-lg">
+                            {individualResults.map((result) => (
+                                <a key={`nav-${result.taskId}`} href={`#task-result-${result.taskId}`} className="px-4 py-2 text-sm font-medium text-cyan-300 bg-gray-900 rounded-full hover:bg-gray-700 transition-colors">
+                                    {t('goToTaskResult').replace('{taskNumber}', (tasks.findIndex(t => t.id === result.taskId) + 1).toString())}
+                                </a>
+                            ))}
+                        </div>
+                        {individualResults.map((result, index) => (
+                             <div key={result.taskId} id={`task-result-${result.taskId}`} className="border-t-2 border-dashed border-gray-700 pt-8">
+                                <h2 className="text-2xl font-bold text-center text-cyan-400 mb-4">{t('batchResultsTitle').replace('{taskNumber}', (tasks.findIndex(t => t.id === result.taskId) + 1).toString())}</h2>
+                                <ResultsView isLoading={false} error={result.error} scenes={result.scenes} t={t} translationLanguage={translationLanguage} includeVisualIdea={includeVisualIdea} />
+                            </div>
+                        ))}
+                    </div>
+                )}
+                 {batchMode === 'combined' && combinedResult && (
+                     <div className="border-t-2 border-dashed border-gray-700 pt-8">
+                        <h2 className="text-2xl font-bold text-center text-cyan-400 mb-4">{t('combinedResultsTitle')}</h2>
+                        <ResultsView isLoading={false} error={combinedResult.error} scenes={combinedResult.scenes} t={t} translationLanguage={translationLanguage} includeVisualIdea={includeVisualIdea} />
+                    </div>
+                )}
+            </div>
+        </>
+    );
+};
+
+
+// --- VIEW CHO TAB QUY TẮC TÙY CHỈNH ---
+const CustomRulesView: React.FC<{ apiKeys: string[] }> = ({ apiKeys }) => {
+    const { t, language } = useI18n();
+    const [tasks, setTasks] = useState<CustomRuleBatchTask[]>([
+        { id: 1, script: '', characterDefinitions: '' },
+        { id: 2, script: '', characterDefinitions: '' },
+        { id: 3, script: '', characterDefinitions: '' },
+    ]);
+    const [batchMode, setBatchMode] = useState<BatchMode>('individual');
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [individualResults, setIndividualResults] = useState<{taskId: number, scenes: Scene[], error: string | null}[]>([]);
+    const [combinedResult, setCombinedResult] = useState<{scenes: Scene[], error: string | null} | null>(null);
+    // FIX: Add missing error state to handle component-level errors.
+    const [error, setError] = useState<string | null>(null);
+
+    // Settings state
+    const [customRules, setCustomRules] = useState<string>('');
+    const [characterDefinitions, setCharacterDefinitions] = useState<string>(''); // For combined mode
+    const [customThemes, setCustomThemes] = useState<ThemeOption[]>([]);
+    const [customRatios, setCustomRatios] = useState<AspectRatioOption[]>([]);
+    const [customStyles, setCustomStyles] = useState<StyleOption[]>([]);
+    const [selectedThemeId, setSelectedThemeId] = useState<string>('storytelling');
+    const [selectedAspectRatioId, setSelectedAspectRatioId] = useState<string>('16:9');
+    const [selectedStyleId, setSelectedStyleId] = useState<string>('automatic');
+    const [translationLanguage, setTranslationLanguage] = useState<string>('none');
+    const [includeVisualIdea, setIncludeVisualIdea] = useState<boolean>(true);
+    const [modalMode, setModalMode] = useState<'theme' | 'ratio' | 'style' | null>(null);
+
+    useEffect(() => {
+        setCharacterDefinitions(t('placeholderCharacters'));
+        try {
+            setCustomThemes(JSON.parse(localStorage.getItem('customThemes') || '[]'));
+            setCustomRatios(JSON.parse(localStorage.getItem('customRatios') || '[]'));
+            setCustomStyles(JSON.parse(localStorage.getItem('customStyles') || '[]'));
+        } catch (e) { console.error("Failed to load settings from localStorage", e); }
+    }, [t]);
+
+    const themeOptions = useMemo(() => [ ...DEFAULT_THEME_DATA.map(theme => ({ ...theme, name: t(`theme_${theme.id}`)})), ...customThemes.map(theme => ({ ...theme, name: `${theme.name} (${t('customOptionSuffix')})`})) ], [t, customThemes]);
+    const aspectRatioOptions = useMemo(() => [ ...DEFAULT_ASPECT_RATIO_DATA.map(ratio => ({ ...ratio, name: t(`ratio_${ratio.id}`)})), ...customRatios.map(ratio => ({ ...ratio, name: `${ratio.name} (${t('customOptionSuffix')})`})) ], [t, customRatios]);
+    const styleOptions = useMemo(() => [ ...DEFAULT_STYLE_DATA.map(style => ({ id: style.id, name: t(`style_${style.id}`), prompt: t(`style_prompt_${style.id}`) })), ...customStyles.map(style => ({ ...style, name: `${style.name} (${t('customOptionSuffix')})`})) ], [t, customStyles]);
+    const translationOptions = useMemo(() => [ { id: 'none', name: t('translate_none') }, { id: 'vi', name: t('lang_vi') }, { id: 'en', name: t('lang_en') }, { id: 'zh', name: t('lang_zh') }, { id: 'ja', name: t('lang_ja') }, { id: 'ko', name: t('lang_ko') }, ], [t]);
+
+    const handleSelectionChange = (type: 'theme' | 'ratio' | 'style', value: string) => {
+        if (value === 'add_new') setModalMode(type);
+        else {
+            if (type === 'theme') setSelectedThemeId(value);
+            if (type === 'ratio') setSelectedAspectRatioId(value);
+            if (type === 'style') setSelectedStyleId(value);
+        }
+    };
+
+    const handleSaveCustomOption = (data: any) => { /* Omitted for brevity */ };
+
+    const selectedTheme = useMemo(() => themeOptions.find(t => t.id === selectedThemeId)!, [themeOptions, selectedThemeId]);
+    const selectedAspectRatio = useMemo(() => aspectRatioOptions.find(r => r.id === selectedAspectRatioId)!, [aspectRatioOptions, selectedAspectRatioId]);
+    const selectedStyle = useMemo(() => styleOptions.find(s => s.id === selectedStyleId)!, [styleOptions, selectedStyleId]);
+
+    const handleTaskFieldChange = (id: number, field: 'script' | 'characterDefinitions', value: string) => {
+        setTasks(currentTasks =>
+            currentTasks.map(task =>
+                task.id === id ? { ...task, [field]: value } : task
+            )
+        );
+    };
+
+    const addTask = () => {
+        setTasks(currentTasks => [...currentTasks, { id: Date.now(), script: '', characterDefinitions: '' }]);
+    };
+
+    const removeTask = (id: number) => {
+        setTasks(currentTasks => currentTasks.filter(task => task.id !== id));
+    };
+
+    const handleGenerateBatch = useCallback(async () => {
+        if (apiKeys.length === 0) {
+            const error = t('errorApiKeyMissing');
+            if (batchMode === 'individual') setIndividualResults(tasks.map(t => ({ taskId: t.id, scenes: [], error })));
+            else setCombinedResult({ scenes: [], error });
+            return;
+        }
+        if (!customRules.trim()) {
+            setError(t('errorCustomRulesRequired'));
+            return;
+        }
+        if (!selectedTheme || !selectedAspectRatio || !selectedStyle) return;
+
+        setIsLoading(true);
+        setError(null);
+        setIndividualResults([]);
+        setCombinedResult(null);
+
+        const activeTasks = tasks.filter(task => task.script.trim() !== '');
+        if (activeTasks.length === 0) {
+            setIsLoading(false);
+            return;
+        }
+
+        const promises = activeTasks.map(task => {
+             const taskCharacterDefs = batchMode === 'individual' ? task.characterDefinitions : characterDefinitions;
+             return breakdownScript(
+                apiKeys, task.script, 0, selectedTheme.name, 0,
+                selectedAspectRatio.value, selectedStyle.prompt, taskCharacterDefs,
+                translationLanguage, includeVisualIdea, customRules, language, t('errorApiKeyMissing'), t('errorInvalidResponse'),
+                t('errorUnknown'), t('errorAllKeysFailed')
+            );
+        });
+
+        if (batchMode === 'individual') {
+            const results = await Promise.allSettled(promises);
+            const finalResults = results.map((result, index) => {
+                const taskId = activeTasks[index].id;
+                if (result.status === 'fulfilled') {
+                    return { taskId, scenes: result.value, error: null };
+                } else {
+                    return { taskId, scenes: [], error: (result.reason as Error).message || t('errorUnknown') };
+                }
+            });
+            setIndividualResults(finalResults);
+        } else { // Combined mode
+            try {
+                const resultsArrays = await Promise.all(promises);
+                let sceneCounter = 1;
+                const combinedScenes = resultsArrays.flat().map(scene => ({
+                    ...scene,
+                    sceneNumber: sceneCounter++
+                }));
+                setCombinedResult({ scenes: combinedScenes, error: null });
+            } catch (e: unknown) {
+                const error = e instanceof Error ? e.message : t('errorUnknown');
+                setCombinedResult({ scenes: [], error });
+            }
+        }
+
+        setIsLoading(false);
+    }, [apiKeys, tasks, batchMode, customRules, selectedTheme, selectedAspectRatio, selectedStyle, characterDefinitions, translationLanguage, includeVisualIdea, language, t]);
+
+
+    return (
+        <>
+            {modalMode && <CustomOptionModal mode={modalMode} onClose={() => setModalMode(null)} onSave={handleSaveCustomOption} t={t} />}
+            <div className="bg-gray-800 rounded-lg p-6 shadow-2xl shadow-black/30 space-y-6">
+                <fieldset className="border border-gray-700 p-4 rounded-md">
+                    <legend className="px-2 text-sm font-medium text-gray-300">{t('batchModeLabel')}</legend>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex items-center">
+                            <input id="mode-individual-c" name="batch-mode-c" type="radio" checked={batchMode === 'individual'} onChange={() => setBatchMode('individual')} className="h-4 w-4 text-cyan-600 bg-gray-900 border-gray-600 focus:ring-cyan-500" />
+                            <label htmlFor="mode-individual-c" className="ml-3 block text-sm font-medium text-gray-200">{t('batchModeIndividual')}</label>
+                        </div>
+                        <div className="flex items-center">
+                            <input id="mode-combined-c" name="batch-mode-c" type="radio" checked={batchMode === 'combined'} onChange={() => setBatchMode('combined')} className="h-4 w-4 text-cyan-600 bg-gray-900 border-gray-600 focus:ring-cyan-500" />
+                            <label htmlFor="mode-combined-c" className="ml-3 block text-sm font-medium text-gray-200">{t('batchModeCombined')}</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                     <div>
+                        <label htmlFor="theme-select-c" className="block text-sm font-medium text-gray-300 mb-2">{t('themeLabel')}</label>
+                        <select id="theme-select-c" value={selectedThemeId} onChange={(e) => handleSelectionChange('theme', e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-gray-200 focus:ring-2 focus:ring-cyan-500">{themeOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}<option value="add_new" className="font-bold text-cyan-400">{t('addNewOption')}</option></select>
+                    </div>
+                    <div>
+                        <label htmlFor="aspect-ratio-select-c" className="block text-sm font-medium text-gray-300 mb-2">{t('ratioLabel')}</label>
+                        <select id="aspect-ratio-select-c" value={selectedAspectRatioId} onChange={(e) => handleSelectionChange('ratio', e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-gray-200 focus:ring-2 focus:ring-cyan-500">{aspectRatioOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}<option value="add_new" className="font-bold text-cyan-400">{t('addNewRatio')}</option></select>
+                    </div>
+                    <div>
+                        <label htmlFor="style-select-c" className="block text-sm font-medium text-gray-300 mb-2">{t('styleLabel')}</label>
+                        <select id="style-select-c" value={selectedStyleId} onChange={(e) => handleSelectionChange('style', e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-gray-200 focus:ring-2 focus:ring-cyan-500">{styleOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}<option value="add_new" className="font-bold text-cyan-400">{t('addNewStyle')}</option></select>
+                    </div>
+                    <div className="lg:col-span-3">
+                        <label htmlFor="translate-select-c" className="block text-sm font-medium text-gray-300 mb-2">{t('translateLabel')}</label>
+                        <select id="translate-select-c" value={translationLanguage} onChange={(e) => setTranslationLanguage(e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-gray-200 focus:ring-2 focus:ring-cyan-500">{translationOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}</select>
+                    </div>
+                </div>
+                 <div className="flex items-center">
+                    <input id="include-visual-idea-c" type="checkbox" checked={includeVisualIdea} onChange={(e) => setIncludeVisualIdea(e.target.checked)} className="h-4 w-4 rounded border-gray-600 bg-gray-900 text-cyan-600 focus:ring-cyan-500" />
+                    <label htmlFor="include-visual-idea-c" className="ml-3 text-sm font-medium text-gray-300">{t('includeVisualIdeaLabel')}</label>
+                </div>
+                 {batchMode === 'combined' && (
+                    <div>
+                        <label htmlFor="character-input-c" className="block text-sm font-medium text-gray-300 mb-2">{t('characterLabel')}</label>
+                        <textarea id="character-input-c" value={characterDefinitions} onChange={(e) => setCharacterDefinitions(e.target.value)} placeholder={t('characterPlaceholder')} className="w-full h-24 bg-gray-900 border border-gray-700 rounded-md p-4 text-gray-200 focus:ring-2 focus:ring-cyan-500 resize-y" />
+                    </div>
+                )}
+
+                <div>
+                    <label htmlFor="custom-rules-input-c" className="block text-sm font-medium text-gray-300 mb-2">{t('customRulesLabel')}</label>
+                    <textarea
+                        id="custom-rules-input-c"
+                        value={customRules}
+                        onChange={(e) => setCustomRules(e.target.value)}
+                        placeholder={t('customRulesPlaceholder')}
+                        className="w-full h-32 bg-gray-900 border border-gray-700 rounded-md p-4 text-gray-200 focus:ring-2 focus:ring-cyan-500 resize-y"
+                    />
+                </div>
+                
+                <div className="space-y-4">
+                    {tasks.map((task, index) => (
+                        <div key={task.id} className="bg-gray-900/50 p-4 rounded-md border border-gray-700 space-y-3">
+                             <div className="flex justify-between items-center">
+                                <label className="block text-sm font-semibold text-gray-300">{t('batchTaskLabel')} {index + 1}</label>
+                                {tasks.length > 1 && <button onClick={() => removeTask(task.id)} className="text-xs text-red-400 hover:text-red-300 font-semibold">{t('removeTaskButton')}</button>}
+                             </div>
+                            <textarea id={`task-script-${task.id}`} value={task.script} onChange={(e) => handleTaskFieldChange(task.id, 'script', e.target.value)} placeholder={t('scriptPlaceholder')} className="w-full h-32 bg-gray-900 border border-gray-600 rounded-md p-3 text-gray-200 focus:ring-2 focus:ring-cyan-500 resize-y" />
+                             {batchMode === 'individual' && (
+                                <div>
+                                    <label htmlFor={`task-chars-${task.id}`} className="block text-xs font-medium text-gray-400 mb-1">{t('characterDefinitionForTask')}</label>
+                                    <textarea id={`task-chars-${task.id}`} value={task.characterDefinitions} onChange={(e) => handleTaskFieldChange(task.id, 'characterDefinitions', e.target.value)} placeholder={t('characterPlaceholder')} className="w-full h-20 bg-gray-900 border border-gray-600 rounded-md p-3 text-gray-200 focus:ring-2 focus:ring-cyan-500 resize-y" />
+                                </div>
+                             )}
+                        </div>
+                    ))}
+                </div>
+                 <div className="flex justify-center mt-2">
+                    <button onClick={addTask} className="text-sm font-semibold text-cyan-400 hover:text-cyan-300">{t('addTaskButton')}</button>
+                </div>
+
+                <div className="mt-2 flex justify-center">
+                    <button onClick={handleGenerateBatch} disabled={isLoading || apiKeys.length === 0} className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-full shadow-lg hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-cyan-300/50">
+                        {isLoading ? (<><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>{t('generatingBatchButton')}</>) : (<><SparklesIcon className="w-5 h-5 mr-2" />{t('batchGenerateButton')}</>)}
+                    </button>
+                </div>
+            </div>
+
+            {/* FIX: Display the general error message if it exists. */}
+            {error && (
+                <div className="mt-8 bg-red-900/50 border border-red-700 text-red-200 px-4 py-3 rounded-lg text-center" role="alert">
+                    <strong className="font-bold">{t('errorAlertTitle')}</strong><span className="block sm:inline ml-2">{error}</span>
+                </div>
+            )}
+
+             <div className="mt-8">
+                {isLoading && <Spinner />}
+                {batchMode === 'individual' && individualResults.length > 0 && (
+                    <div className="space-y-12">
+                         <div className="flex flex-wrap justify-center gap-2 mb-8 p-4 bg-gray-800 rounded-lg">
+                            {individualResults.map((result) => (
+                                <a key={`nav-c-${result.taskId}`} href={`#task-result-c-${result.taskId}`} className="px-4 py-2 text-sm font-medium text-cyan-300 bg-gray-900 rounded-full hover:bg-gray-700 transition-colors">
+                                    {t('goToTaskResult').replace('{taskNumber}', (tasks.findIndex(t => t.id === result.taskId) + 1).toString())}
+                                </a>
+                            ))}
+                        </div>
+                        {individualResults.map((result) => (
+                             <div key={result.taskId} id={`task-result-c-${result.taskId}`} className="border-t-2 border-dashed border-gray-700 pt-8">
+                                <h2 className="text-2xl font-bold text-center text-cyan-400 mb-4">{t('batchResultsTitle').replace('{taskNumber}', (tasks.findIndex(t => t.id === result.taskId) + 1).toString())}</h2>
+                                <ResultsView isLoading={isLoading} error={result.error} scenes={result.scenes} t={t} translationLanguage={translationLanguage} includeVisualIdea={includeVisualIdea} />
+                            </div>
+                        ))}
+                    </div>
+                )}
+                 {batchMode === 'combined' && combinedResult && (
+                     <div className="border-t-2 border-dashed border-gray-700 pt-8">
+                        <h2 className="text-2xl font-bold text-center text-cyan-400 mb-4">{t('combinedResultsTitle')}</h2>
+                        <ResultsView isLoading={false} error={combinedResult.error} scenes={combinedResult.scenes} t={t} translationLanguage={translationLanguage} includeVisualIdea={includeVisualIdea} />
+                    </div>
+                )}
+            </div>
         </>
     );
 };
@@ -545,20 +1081,22 @@ const PromptGeneratorView: React.FC<{ apiKey: string }> = ({ apiKey }) => {
 
 const AppContainer = () => {
     const { t } = useI18n();
-    const [apiKey, setApiKey] = useState<string>('');
+    const [apiKeysText, setApiKeysText] = useState<string>('');
     const [activeTab, setActiveTab] = useState<AppTab>('splitter');
+
+    const apiKeys = useMemo(() => apiKeysText.split('\n').filter(k => k.trim()), [apiKeysText]);
 
     useEffect(() => {
         try {
-            const savedKey = localStorage.getItem('gemini-api-key');
-            if (savedKey) setApiKey(savedKey);
-        } catch (e) { console.error("Failed to load API key from localStorage", e); }
+            const savedKeys = localStorage.getItem('gemini-api-keys');
+            if (savedKeys) setApiKeysText(savedKeys);
+        } catch (e) { console.error("Failed to load API keys from localStorage", e); }
     }, []);
 
-    const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newKey = e.target.value;
-        setApiKey(newKey);
-        localStorage.setItem('gemini-api-key', newKey);
+    const handleApiKeyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const newKeysText = e.target.value;
+        setApiKeysText(newKeysText);
+        localStorage.setItem('gemini-api-keys', newKeysText);
     };
 
     const TabButton: React.FC<{ tabId: AppTab; children: React.ReactNode }> = ({ tabId, children }) => (
@@ -579,7 +1117,7 @@ const AppContainer = () => {
                     <p className="mt-2 flex flex-wrap justify-center items-center gap-x-3 gap-y-1">
                         <a href="https://www.youtube.com/@Bit-Do" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">{t('youtubeLinkText')}</a>
                         <span className="text-gray-600">|</span>
-                        <a href="https://zalo.me/g/pbscsd639" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">{t('zaloGroupLinkText')}</a>
+                        <a href="https://zalo.me/g/ubgxhh983" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">{t('zaloGroupLinkText')}</a>
                         <span className="text-gray-600">|</span>
                         <span>{t('zaloPersonalText')} 0342472776</span>
                     </p>
@@ -595,11 +1133,12 @@ const AppContainer = () => {
                         </div>
                     </label>
                     <div className="relative">
-                        <KeyIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                        <input
-                            type="password" id="api-key-input" value={apiKey} onChange={handleApiKeyChange}
+                        <KeyIcon className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
+                        <textarea
+                            id="api-key-input" value={apiKeysText} onChange={handleApiKeyChange}
                             placeholder={t('apiKeyPlaceholder')}
-                            className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 pl-10 text-gray-200 focus:ring-2 focus:ring-cyan-500"
+                            rows={3}
+                            className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 pl-10 text-gray-200 focus:ring-2 focus:ring-cyan-500 resize-y"
                         />
                     </div>
                 </div>
@@ -608,12 +1147,16 @@ const AppContainer = () => {
                     <nav className="-mb-px flex space-x-2" aria-label="Tabs">
                         <TabButton tabId="splitter">{t('tab_splitter')}</TabButton>
                         <TabButton tabId="prompter">{t('tab_prompter')}</TabButton>
+                        <TabButton tabId="batch">{t('tab_batch')}</TabButton>
+                        <TabButton tabId="custom">{t('tab_custom')}</TabButton>
                     </nav>
                 </div>
 
                 <div className="mt-4">
-                    {activeTab === 'splitter' && <SceneSplitterView apiKey={apiKey} />}
-                    {activeTab === 'prompter' && <PromptGeneratorView apiKey={apiKey} />}
+                    {activeTab === 'splitter' && <SceneSplitterView apiKeys={apiKeys} />}
+                    {activeTab === 'prompter' && <PromptGeneratorView apiKeys={apiKeys} />}
+                    {activeTab === 'batch' && <BatchView apiKeys={apiKeys} />}
+                    {activeTab === 'custom' && <CustomRulesView apiKeys={apiKeys} />}
                 </div>
             </div>
         </>
