@@ -142,7 +142,7 @@ const translations: AllTranslations = {
     zaloPersonalText: "Zalo Cá nhân:",
 
     // Footer
-    footerText: "Bản quyền thuộc về <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. Tham gia <a href='https://zalo.me/g/ubgxhh983' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>nhóm Zalo</a> | Liên hệ: 0342472776.",
+    footerText: "Bản quyền thuộc về <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. Tham gia <a href='https://zalo.me/g/icgdoy825' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>nhóm Zalo</a> | Liên hệ: 0342472776.",
 
     // Default Option Names
     theme_storytelling: "Kể chuyện / Tóm tắt phim",
@@ -436,7 +436,7 @@ const translations: AllTranslations = {
     youtubeLinkText: "YouTube 频道",
     zaloGroupLinkText: "Zalo 群组",
     zaloPersonalText: "个人 Zalo:",
-    footerText: "版权所有 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. 加入 <a href='https://zalo.me/g/ubgxhh983' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo 群组</a> | 联系: 0342472776.",
+    footerText: "版权所有 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. 加入 <a href='https://zalo.me/g/icgdoy825' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo 群组</a> | 联系: 0342472776.",
     theme_storytelling: "故事/电影解说",
     theme_news: "新闻/更新",
     theme_science: "科学/发现",
@@ -582,7 +582,7 @@ const translations: AllTranslations = {
     youtubeLinkText: "YouTubeチャンネル",
     zaloGroupLinkText: "Zaloグループ",
     zaloPersonalText: "個人Zalo:",
-    footerText: "著作権 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. <a href='https://zalo.me/g/ubgxhh983' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo グループ</a>に参加 | 連絡先: 0342472776.",
+    footerText: "著作権 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. <a href='https://zalo.me/g/icgdoy825' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo グループ</a>に参加 | 連絡先: 0342472776.",
     theme_storytelling: "物語/映画の要約",
     theme_news: "ニュース/更新情報",
     theme_science: "科学/発見",
@@ -728,7 +728,7 @@ const translations: AllTranslations = {
     youtubeLinkText: "YouTube 채널",
     zaloGroupLinkText: "Zalo 그룹",
     zaloPersonalText: "개인 Zalo:",
-    footerText: "저작권 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. <a href='https://zalo.me/g/ubgxhh983' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo 그룹</a>에 가입 | 연락처: 0342472776.",
+    footerText: "저작권 © <a href='https://www.youtube.com/@Bit-Do' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Bit Đô</a>. <a href='https://zalo.me/g/icgdoy825' target='_blank' rel='noopener noreferrer' class='text-cyan-400 hover:underline'>Zalo 그룹</a>에 가입 | 연락처: 0342472776.",
     theme_storytelling: "스토리텔링 / 영화 요약",
     theme_news: "뉴스 / 업데이트",
     theme_science: "과학 / 발견",
